@@ -13,15 +13,33 @@ public class TaskJMRun extends DefaultTask {
 
     protected final Logger log = Logging.getLogger(getClass());
 
+    File testFile = null
+
+    /**
+     * Run a Jmeter Test
+     *
+     * Run a Jmeter Test using the configuration from the JMPluginExtension and inside this task.
+     * The configuration inside the jmRum task can override partially or fully any JMPluginExtension configuration.
+     *
+     * @return
+     */
+    // TODO: Allow all properties in JMPluginExtension to be overridden.
     @TaskAction
     jmRun() {
 
-        //Get List of test files to run
-        List<File> testFiles = JMUtils.getListOfTestFiles(project)
-
         //Run Tests
         List<File> resultList = new ArrayList<File>();
-        for (File testFile : testFiles) resultList.add(executeJmeterTest(testFile))
+
+        if (testFile == null) {
+            //Get List of test files to run
+            List<File> testFiles = JMUtils.getListOfTestFiles(project)
+            for (File testFile : testFiles) {
+                resultList.add(executeJmeterTest(testFile))
+            }
+        } else {
+            // Run the test defined in the task instead of in the jmeter config
+            resultList.add(executeJmeterTest(testFile))
+        }
 
         //Scan for errors
         checkForErrors(resultList);

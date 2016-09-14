@@ -7,6 +7,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 public class TaskJMRun extends DefaultTask {
@@ -15,6 +17,8 @@ public class TaskJMRun extends DefaultTask {
 
     File testFile = null
 
+    @Optional
+    @OutputFile
     File resultFile = null
 
     List<String> userProperties = null      //maps to -J, --jmeterproperty
@@ -59,7 +63,8 @@ public class TaskJMRun extends DefaultTask {
         } else {
             // Run the test defined in the task instead of in the jmeter config
             JMTestConfiguration testConfig = setupTestConfig(testFile);
-            resultList.add(executeJmeterTest(testConfig));
+            resultFile = executeJmeterTest(testConfig)
+            resultList.add(resultFile);
         }
         //Scan for errors
         checkForErrors(resultList);
@@ -75,7 +80,7 @@ public class TaskJMRun extends DefaultTask {
 
         testConfig.userProperties = userProperties ?: project.jmeter.jmUserProperties
 
-        testConfig.jmSystemPropertiesFiles = jmSystemPropertiesFiles ?:project.jmeter.jmSystemPropertiesFiles
+        testConfig.jmSystemPropertiesFiles = jmSystemPropertiesFiles ?: project.jmeter.jmSystemPropertiesFiles
         testConfig.jmSystemProperties = jmSystemProperties ?: project.jmeter.jmSystemProperties
 
         testConfig.jmPropertyFile  = jmPropertyFile ?: JMUtils.getJmeterPropsFile(project)
@@ -168,8 +173,4 @@ public class TaskJMRun extends DefaultTask {
             throw new GradleException("Can't execute test", e);
         }
     }
-
-
-
-
 }

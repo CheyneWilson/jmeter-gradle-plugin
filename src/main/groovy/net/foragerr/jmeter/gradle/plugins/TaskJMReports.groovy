@@ -10,6 +10,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.rendersnake.HtmlAttributes
 import org.rendersnake.HtmlCanvas
@@ -43,20 +45,35 @@ public class TaskJMReports extends DefaultTask {
 //	@InputDirectory
 //	def File project.jmeter.reportDir
 
+    @InputFile
+    @Optional
+    File resultFile
+
     @TaskAction
     jmCreateReport(){
 
         reportDir = project.jmeter.reportDir ?: new File(project.buildDir, "jmeter-report")
 
-		//Get List of resultFiles
-		List<File> jmResultFiles = new ArrayList<File>()
-		jmResultFiles.addAll(JMUtils.scanDir(project, ["**/*.xml"] as String[], [] as String[], reportDir));
+        List<File> jmResultFiles = new ArrayList<File>()
+
+        if (resultFile != null) {
+            jmResultFiles.add(resultFile)
+        }
+		else {
+            //Get List of resultFiles
+            jmResultFiles.addAll(JMUtils.scanDir(project, ["**/*.xml"] as String[], [] as String[], reportDir));
+        }
 		
-		if (jmResultFiles.size()==0) log.warn("There are no results file to create reports from")
+		if (jmResultFiles.size()==0) {
+            log.warn("There are no results file to create reports from")
+        }
 		
-        if (project.jmeter.enableReports == true)makeHTMLReport(jmResultFiles)
-        if (project.jmeter.enableExtendedReports == true) makeExtendedReports(jmResultFiles)
-		
+        if (project.jmeter.enableReports == true) {
+            makeHTMLReport(jmResultFiles)
+        }
+        if (project.jmeter.enableExtendedReports == true) {
+            makeExtendedReports(jmResultFiles)
+        }
     }
 	
 	private void makeExtendedReports(List<File> results) throws IOException {

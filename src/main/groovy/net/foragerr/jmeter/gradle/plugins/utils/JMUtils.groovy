@@ -40,12 +40,14 @@ class JMUtils {
         File propsInSrcDir = new File(project.jmeter.testFileDir,"jmeter.properties");
 
         //1. Is jmeterPropertyFile defined?
-        if (project.jmeter.jmPropertyFile != null)
+        if (project.jmeter.jmPropertyFile != null) {
             return project.jmeter.jmPropertyFile;
+        }
 
         //2. Does jmeter.properties exist in $srcDir/test/jmeter
-        else if (propsInSrcDir.exists())
+        else if (propsInSrcDir.exists()) {
             return propsInSrcDir;
+        }
 
         //3. If neither, use the default jmeter.properties
         else{

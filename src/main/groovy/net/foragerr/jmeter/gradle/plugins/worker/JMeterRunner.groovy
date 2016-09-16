@@ -25,30 +25,33 @@ class JMeterRunner {
         }
     }
 
-    void executeJmeterCommand(JMSpecs specs, String workingDirectory) {
-        ProcessBuilder processBuilder = new ProcessBuilder(createArgumentList(specs, workingDirectory, "org.apache.jmeter.NewDriver")).inheritIO()
-        launchProcess(processBuilder, workingDirectory);
+    void executeJmeterCommand(JMSpecs specs ) {
+        ProcessBuilder processBuilder = new ProcessBuilder(createArgumentList(specs, "org.apache.jmeter.NewDriver")).inheritIO()
+        launchProcess(processBuilder, specs.workDir.getAbsolutePath());
     }
 
-    private String[] createArgumentList(JMSpecs specs, String workDir, String launchClass) {
+    private String[] createArgumentList(JMSpecs specs, String launchClass) {
         String javaRuntime = "java"
 
         List<String> argumentsList = new ArrayList<>()
         argumentsList.add(javaRuntime)
-        argumentsList.add("-Xms${specs.minHeapSize}".toString())
-        argumentsList.add("-Xmx${specs.maxHeapSize}".toString())
-        argumentsList.addAll(specs.getUserSystemProperties())
-        specs.getSystemProperties().each {k,v ->
-            argumentsList.add("-D$k=$v".toString())
-        }
+
+        argumentsList.addAll(specs.getJavaCommandLineArguments())
+
         argumentsList.add("-cp")
+        String workDir = specs.workDir.getAbsolutePath()
         argumentsList.add(workDir + File.separator + "lib" + System.getProperty("path.separator") +
             workDir + File.separator + "lib" + File.separator + "ext" + System.getProperty("path.separator") +
             generatePatherJar(workDir).getAbsolutePath())
+
         argumentsList.add(launchClass)
-        argumentsList.addAll(specs.jmeterProperties)
+        List<String>  args = specs.getJmeterCommandLineArguments()
+        LOGGER.info("JMeter is called with the following command line arguments: " + args.toString());
+        argumentsList.addAll(args)
+
         LOGGER.debug("Command to run is $argumentsList")
-        argumentsList.toArray(new String[argumentsList.size()])
+
+        return argumentsList as String[]
     }
 
     /**

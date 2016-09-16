@@ -77,7 +77,7 @@ class TaskJMInit extends DefaultTask {
         tempProperties.add(defaultJmeterProperties);
 
         File jmPluginProperties = new File(project.jmeter.workDir, "jmeter-plugin.properties");
-        System.setProperty("default_jm_properties", "/" + jmPluginProperties.getName());
+        System.setProperty("default_jm_plugin_properties", "/" + jmPluginProperties.getName());
         tempProperties.add(jmPluginProperties);
 
         //Copy files from jar to workDir

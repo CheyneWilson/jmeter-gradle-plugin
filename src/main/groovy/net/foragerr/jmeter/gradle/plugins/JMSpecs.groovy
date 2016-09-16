@@ -1,51 +1,123 @@
 package net.foragerr.jmeter.gradle.plugins
 
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
+/**
+ * This class contains the configuration for an individual JMeter test run.
+ *
+ * It also contains methods to output the command line arguments used when invoking a JMeter test script.
+ */
 class JMSpecs implements Serializable{
 
-    private String maxHeapSize
-    private String minHeapSize
-    private List<String> jmeterProperties = new ArrayList<>()
-    private Map<String, String> systemProperties = new HashMap<>()
-    private List<String> userSystemProperties = new ArrayList<>()
+    private final static Logger LOG = Logging.getLogger(getClass());
 
-    List<String> getUserSystemProperties() {
-        return userSystemProperties
+    File jmTestFile = null                      //maps to -t, --testfile
+    File jmLog = null
+
+    String maxHeapSize
+    String minHeapSize
+
+    File propFile = null                        //maps to -p, --propfile
+    List<File> addPropFiles = null              //maps to -q, --addprop
+    Map<String, ?> jmeterProperties = null      //maps to -J, --jmeterproperty
+
+    Boolean ignoreErrors = null
+    Boolean ignoreFailures = null
+    Boolean remote = false
+
+    Boolean enableReports = null
+    Boolean enableExtendedReports = null
+
+    List<File> systemPropertiesFiles = null                    // maps to -S, --systemPropertyFile
+    Map<String, ?> systemProperties = new HashMap<>()          // maps to -D, --systemproperty
+
+    Map<String, ?> globalProperties                            // maps to -G, --globalproperty
+
+    List<String> jmPluginJars = null
+
+    String resultFilenameTimestamp
+    String reportPostfix
+    String reportXslt = null
+    String reportTitle = null
+    File customReportXslt
+
+    File workDir = null
+    File reportDir = null
+    File resultFile = null
+
+    /**
+     * Returns the JMeter command line arguments used when invoking jmeter to run the test configured in this JMSpec
+     *
+     * @return the JMeter command line arguments used when invoking jmeter to run the test configured in this JMSpec
+     */
+    List<String> getJmeterCommandLineArguments() {
+        List<String> args = new ArrayList<String>();
+
+        args.addAll(Arrays.asList("-n",
+                "-t", jmTestFile.getCanonicalPath(),
+                "-l", resultFile.getCanonicalPath(),
+                "-p", propFile.getCanonicalPath()
+        ));
+
+        if (addPropFiles) {
+            boolean hasPrefix = false
+            for (File addPropFile : addPropFiles) {
+                if (addPropFile.exists() && addPropFile.isFile()) {
+                    if(!hasPrefix){
+                        args.add("-q");
+                        hasPrefix = true
+                    }
+                    args.add(addPropFile.getCanonicalPath());
+                } else {
+                    LOG.warn("Addtional Property File ${addPropFile} was not valid.")
+                }
+            }
+        }
+
+        if (jmeterProperties != null) {
+            jmeterProperties.each {k,v ->
+                args.add("-J$k=$v")
+            }
+        }
+
+        if (remote) {
+            args.add("-r");
+        }
+
+        return args
     }
 
-    void setUserSystemProperties(List<String> userSystemProperties) {
-        this.userSystemProperties = userSystemProperties
-    }
+    /**
+     * Returns the java command line arguments used when invoking jmeter to run the test configured in this JMSpec
+     *
+     * @return the java command line arguments used when invoking jmeter to run the test configured in this JMSpec
+     */
+    List<String> getJavaCommandLineArguments () {
+        List<String> args = new ArrayList<String>();
 
-    String getMaxHeapSize() {
-        return maxHeapSize
-    }
+        args.add("-Xms${minHeapSize}")
+        args.add("-Xmx${maxHeapSize}")
 
-    void setMaxHeapSize(String maxHeapSize) {
-        this.maxHeapSize = maxHeapSize
-    }
+        if (systemPropertiesFiles != null) {
+            for (File systemPropertyFile : systemPropertiesFiles) {
+                if (systemPropertyFile.exists() && systemPropertyFile.isFile()) {
+                    args.addAll(Arrays.asList("-S", systemPropertyFile.getCanonicalPath()));
+                }
+                else {
+                    LOG.warn("System property file ${systemPropertyFile} was not valid.")
+                }
+            }
+        }
 
-    String getMinHeapSize() {
-        return minHeapSize
-    }
-
-    void setMinHeapSize(String minHeapSize) {
-        this.minHeapSize = minHeapSize
-    }
-
-    List<String> getJmeterProperties() {
-        return jmeterProperties
-    }
-
-    void setJmeterProperties(List<String> jmeterProperties) {
-        this.jmeterProperties = jmeterProperties
-    }
-
-    Map<String, String> getSystemProperties() {
-        return systemProperties
-    }
-
-    void setSystemProperties(Map<String, String> systemProperties) {
-        this.systemProperties = systemProperties
+        if (systemProperties != null) {
+            //TODO: may not work if $v has a space in it .. change how args are added.
+            systemProperties.each { k,v ->
+                args.add("-D$k=$v")
+            }
+        }
+        return args
     }
 }
+
+

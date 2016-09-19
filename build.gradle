@@ -20,7 +20,7 @@ version = "$thisPluginVersion-$jmVersion-BETA"
 
 //--- Repositories ---
 repositories {
-    maven{ url 'https://repository.apache.org/content/repositories/releases'}
+    mavenCentral()
     jcenter()
 }
 configurations{
@@ -32,7 +32,7 @@ dependencies {
     gradleApi gradleApi()
     compile project.configurations.getByName('gradleApi')
             .filter {it.name != 'groovy-all-2.4.4.jar'}
-    compile	'org.codehaus.groovy:groovy-all:2.4.6'
+    compile	'org.codehaus.groovy:groovy-all:2.4.7'
     compile 'xml-apis:xml-apis:1.4.01'
     compile	'org.apache.ant:ant:1.8.4'
     compile	'org.rendersnake:rendersnake:1.8'

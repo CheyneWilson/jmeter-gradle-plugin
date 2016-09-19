@@ -2,10 +2,22 @@ package net.foragerr.jmeter.gradle.plugins
 
 class JMPluginExtension {
 
-    File jmLog = null          // maps to -j, --jmeterlogfile
+    List<File> testFiles = null                      //maps to -t, --testfile
     File testFileDir = null
-    File jmPropertyFile = null //maps to -p, --propfile
-    File jmAddProp = null      //maps to -q, --addprop
+    List<String> includes = null
+    List<String> excludes = null
+
+    File jmeterLogFile = null                       //maps to -j, --jmeterlogfile
+
+    File propFile = null                            //maps to -p, --propfile
+    List<File> addPropFiles = null                  //maps to -q, --addprop
+    Map<String, ?> jmeterProperties = null          //maps to -J, --jmeterproperty
+
+    List<File> systemPropertiesFiles = null         //maps to -S, --systemPropertyFile
+    Map<String, ?> systemProperties = null          //maps to -D, --systemproperty
+
+    Map<String, ?> globalProperties = null
+
     File customReportXslt
 
     Boolean ignoreErrors = null
@@ -14,19 +26,7 @@ class JMPluginExtension {
     Boolean enableReports = null
     Boolean enableExtendedReports = null
 
-    List<File> jmTestFiles = null             //maps to -t, --testfile
-    List<File> jmSystemPropertiesFiles = null //maps to -S, --systemPropertyFile
-    //TODO: Change to a map
-    List<String> jmSystemProperties = null    //maps to -D, --systemproperty
-
     List<String> jmPluginJars = null
-    //TODO: Change to a map
-    List<String> jmUserProperties = null      //maps to -J, --jmeterproperty
-
-    Map<String, ?> globalProperties = null
-
-    List<String> includes = null
-    List<String> excludes = null
 
     String resultFilenameTimestamp
     String reportPostfix

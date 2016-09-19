@@ -29,15 +29,15 @@ class TaskJMInit extends DefaultTask {
 
         project.jmeter.reportDir = project.jmeter.reportDir ?: new File(buildDir, "jmeter-report")
 
-        project.jmeter.jmLog = project.jmeter.jmLog ?:  new File(project.jmeter.reportDir, "jmeter.log")
+        project.jmeter.jmeterLogFile = project.jmeter.jmeterLogFile ?:  new File(project.jmeter.reportDir, "jmeter.log")
 
-        project.jmeter.testFileDir = project.jmeter.testFileDir == null ? new File(project.getProjectDir(), "src/test/jmeter") : project.jmeter.testFileDir;
+        project.jmeter.testFileDir = project.jmeter.testFileDir ?: new File(project.getProjectDir(), "src/test/jmeter")
 
         project.jmeter.ignoreErrors = project.jmeter.ignoreErrors == null ? true : project.jmeter.ignoreErrors
         project.jmeter.ignoreFailures = project.jmeter.ignoreFailures == null ? true : project.jmeter.ignoreFailures
         project.jmeter.enableReports = project.jmeter.enableReports == null ? false : project.jmeter.enableReports
         project.jmeter.enableExtendedReports = project.jmeter.enableExtendedReports == null ? true : project.jmeter.enableExtendedReports
-        LoadPluginProperties()
+        loadPluginProperties()
         project.jmeter.jmVersion = this.jmeterVersion
 
         //Create required folders
@@ -54,9 +54,9 @@ class TaskJMInit extends DefaultTask {
         //print version info
         log.info("------------------------")
         log.info("Using")
-        log.info("   jmeter-gradle-plugin version:" + this.thisPluginVersion);
-        log.info("   jmeter version:" + this.jmeterVersion);
-        log.info("   jmeter jp@gc plugins version:" + this.jmeterPluginsVersion);
+        log.info("   jmeter-gradle-plugin version: ${this.thisPluginVersion}");
+        log.info("   jmeter version: ${this.jmeterVersion}" );
+        log.info("   jmeter jp@gc plugins version: ${this.jmeterPluginsVersion}");
         log.info("------------------------")
     }
 
@@ -118,11 +118,16 @@ class TaskJMInit extends DefaultTask {
         log.debug("Search path is set to " + System.getProperty("search_paths"))
     }
 
-    private void LoadPluginProperties() {
+    private void loadPluginProperties() {
+        log.debug("Plugins properties file is: ${this.getClass().getClassLoader().getResource("jmeter-plugin.properties")}")
+
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("jmeter-plugin.properties")
             if (is == null) {
                 log.error("Error fetching jmeter version")
+                // TODO: Sometimes this breaks because another process 'locks' the jar containing the jmeter-plugin.properties
+                // Investigate the root cause, seems related to the following:
+                // https://discuss.gradle.org/t/getresourceasstream-returns-null-in-plugin-in-daemon-mode/2385/10
                 throw new GradleException("Error fetching jmeter version")
             }
             Properties pluginProps = new Properties()

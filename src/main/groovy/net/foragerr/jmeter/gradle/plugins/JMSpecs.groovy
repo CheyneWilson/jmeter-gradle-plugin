@@ -12,8 +12,10 @@ class JMSpecs implements Serializable{
 
     private final static Logger LOG = Logging.getLogger(getClass());
 
-    File jmTestFile = null                      //maps to -t, --testfile
-    File jmLog = null
+    File testFile = null                      //maps to -t, --testfile
+    File jmeterLogFile = null
+
+    boolean nongui = true
 
     String maxHeapSize
     String minHeapSize
@@ -54,9 +56,19 @@ class JMSpecs implements Serializable{
     List<String> getJmeterCommandLineArguments() {
         List<String> args = new ArrayList<String>();
 
-        args.addAll(Arrays.asList("-n",
-                "-t", jmTestFile.getCanonicalPath(),
-                "-l", resultFile.getCanonicalPath(),
+        if(nongui){
+            args.add("-n")
+        }
+
+        if(testFile != null){
+            args.addAll(Arrays.asList("-t", testFile.getCanonicalPath()))
+        }
+
+        if(resultFile != null){
+            args.addAll(Arrays.asList("-l", resultFile.getCanonicalPath()))
+        }
+
+        args.addAll(Arrays.asList(
                 "-p", propFile.getCanonicalPath()
         ));
 

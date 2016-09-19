@@ -5,11 +5,11 @@ The original plugin 'almost' met my requirements, and looks like the most promis
 I wanted to migrate my existing test cases from Jenkins+Ant with config stored in multiple places to a coherent config that is easy to run remotely and locally.
 
 ## Short term goals
- # Support multiple test cases with different config properties in a single build script
- # Remote execution on multiple injectors
- # ctrl^c cancelling local build. Remote injectors stopping if parent stopped
- # More documentation
- # Some tests for the plugin
+ * Support multiple test cases with different config properties in a single build script
+ * Remote execution on multiple injectors
+ * ctrl^c cancelling local build. Remote injectors stopping if parent stopped
+ * More documentation
+ * Some tests for the plugin
 
 ## Example usage (from dev)
 ```groovy

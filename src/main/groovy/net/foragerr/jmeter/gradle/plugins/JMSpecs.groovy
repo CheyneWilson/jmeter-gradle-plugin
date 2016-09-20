@@ -24,17 +24,22 @@ class JMSpecs implements Serializable{
     List<File> addPropFiles = null              //maps to -q, --addprop
     Map<String, ?> jmeterProperties = null      //maps to -J, --jmeterproperty
 
-    Boolean ignoreErrors = null
-    Boolean ignoreFailures = null
-    Boolean remote = false
-
-    Boolean enableReports = null
-    Boolean enableExtendedReports = null
-
     List<File> systemPropertiesFiles = null                    // maps to -S, --systemPropertyFile
     Map<String, ?> systemProperties = new HashMap<>()          // maps to -D, --systemproperty
 
-    Map<String, ?> globalProperties                            // maps to -G, --globalproperty
+    Map<String, ?> globalProperties = null          //maps to -G, --globalproperty
+    File globalPropertiesFile                       //pass the properties in the files to remote injectors via -G
+
+    Boolean remote = false                          //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
+    List<String> remoteHosts                        //convenience field, maps to -Jremote_hosts=S1,S2,S3...
+    List<String> remoteStart                        //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
+    Boolean remoteExit = false                      //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
+
+    Boolean ignoreErrors = null
+    Boolean ignoreFailures = null
+
+    Boolean enableReports = null
+    Boolean enableExtendedReports = null
 
     List<String> jmPluginJars = null
 
@@ -72,29 +77,64 @@ class JMSpecs implements Serializable{
                 "-p", propFile.getCanonicalPath()
         ));
 
+        if(remoteStart != null){
+            args.add("-R${remoteStart.join(",")}");
+        } else if (remoteHosts != null){
+            args.add("-Jremote_hosts${remoteHosts.join(",")}");
+        }
+
+        if(remote){
+            args.add("-r")
+        }
+
+        if(remoteExit){
+            args.add("-X")
+        }
+
         if (addPropFiles) {
-            boolean hasPrefix = false
             for (File addPropFile : addPropFiles) {
                 if (addPropFile.exists() && addPropFile.isFile()) {
-                    if(!hasPrefix){
-                        args.add("-q");
-                        hasPrefix = true
-                    }
-                    args.add(addPropFile.getCanonicalPath());
+                    args.addAll(Arrays.asList("-q", addPropFile.getCanonicalPath()));
                 } else {
                     LOG.warn("Addtional Property File ${addPropFile} was not valid.")
                 }
             }
         }
 
-        if (jmeterProperties != null) {
-            jmeterProperties.each {k,v ->
-                args.add("-J$k=$v")
+        if (systemPropertiesFiles != null) {
+            for (File systemPropertyFile : systemPropertiesFiles) {
+                if (systemPropertyFile.exists() && systemPropertyFile.isFile()) {
+                    args.addAll(Arrays.asList("-S", systemPropertyFile.getCanonicalPath()));
+                }
+                else {
+                    LOG.warn("System property file ${systemPropertyFile} was not valid.")
+                }
             }
         }
 
-        if (remote) {
-            args.add("-r");
+        if (globalPropertiesFile != null) {
+            globalPropertiesFile.withInputStream {
+                properties.load(it)
+            }
+
+            globalPropertiesFile.each {
+                println("-G{$it.key}=${it.value}")
+                args.add("-G{$it.key}=${it.value}")
+            }
+        }
+
+        if (globalProperties != null) {
+            globalProperties.each {k,v ->
+                k.replaceAll(" ", "\\ ")
+                args.add("-G$k=$v")
+            }
+        }
+
+        if (jmeterProperties != null) {
+            jmeterProperties.each {k,v ->
+                k.replaceAll(" ", "\\ ")
+                args.add("-J$k=${v}")
+            }
         }
 
         return args
@@ -111,23 +151,13 @@ class JMSpecs implements Serializable{
         args.add("-Xms${minHeapSize}")
         args.add("-Xmx${maxHeapSize}")
 
-        if (systemPropertiesFiles != null) {
-            for (File systemPropertyFile : systemPropertiesFiles) {
-                if (systemPropertyFile.exists() && systemPropertyFile.isFile()) {
-                    args.addAll(Arrays.asList("-S", systemPropertyFile.getCanonicalPath()));
-                }
-                else {
-                    LOG.warn("System property file ${systemPropertyFile} was not valid.")
-                }
+        if (systemProperties != null) {
+            systemProperties.each { k,v ->
+                k.replaceAll(" ", "\\ ")
+                args.add("-D$k=\"$v\"")
             }
         }
 
-        if (systemProperties != null) {
-            //TODO: may not work if $v has a space in it .. change how args are added.
-            systemProperties.each { k,v ->
-                args.add("-D$k=$v")
-            }
-        }
         return args
     }
 }

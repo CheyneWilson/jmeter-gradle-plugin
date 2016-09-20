@@ -80,7 +80,7 @@ class JMSpecs implements Serializable{
         if(remoteStart != null){
             args.add("-R${remoteStart.join(",")}");
         } else if (remoteHosts != null){
-            args.add("-Jremote_hosts${remoteHosts.join(",")}");
+            args.add("-Jremote_hosts=${remoteHosts.join(",")}");
         }
 
         if(remote){

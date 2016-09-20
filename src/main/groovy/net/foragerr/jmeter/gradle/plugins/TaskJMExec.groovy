@@ -31,7 +31,13 @@ class TaskJMExec extends DefaultTask {
     List<File> systemPropertiesFiles = null     //maps to -S, --systemPropertyFile
     Map<String, ?> systemProperties = null      //maps to -D, --systemproperty
 
-    Map<String, ?> globalProperties = null
+    Map<String, ?> globalProperties = null      //maps to -G, --globalproperty
+    File globalPropertiesFile    = null         //pass the properties in the file to remote injectors via -G
+
+    Boolean remote = false                      //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
+    List<String> remoteHosts                    //convenience field, maps to -Jremote_hosts=S1,S2,S3...
+    List<String> remoteStart                    //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
+    Boolean remoteExit = false                  //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
 
     File workDir = null
 
@@ -40,7 +46,8 @@ class TaskJMExec extends DefaultTask {
     String maxHeapSize
     String minHeapSize
 
-    Boolean remote
+
+
 
     /**
      * Create a new JMSpecs file from the in
@@ -67,6 +74,12 @@ class TaskJMExec extends DefaultTask {
         testConfig.systemProperties = systemProperties ?: project.jmeter.systemProperties ?: new HashMap<String, ?>()
 
         testConfig.globalProperties = globalProperties ?: project.jmeter.globalProperties ?: new HashMap<String, ?>()
+        testConfig.globalPropertiesFile = globalPropertiesFile ?: project.jmeter.globalPropertiesFile
+
+        testConfig.remoteHosts = remoteHosts ?: project.jmeter.remoteHosts
+        testConfig.remoteStart = remoteStart ?: project.jmeter.remoteStart
+        testConfig.remoteExit = remoteExit ?: project.jmeter.remoteExit
+
 
         // TODO: Decide when/where these get set
         testConfig.getSystemProperties().put("search_paths", System.getProperty("search_paths"));

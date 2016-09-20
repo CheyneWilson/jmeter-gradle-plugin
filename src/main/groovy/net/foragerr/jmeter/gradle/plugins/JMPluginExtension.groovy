@@ -16,13 +16,17 @@ class JMPluginExtension {
     List<File> systemPropertiesFiles = null         //maps to -S, --systemPropertyFile
     Map<String, ?> systemProperties = null          //maps to -D, --systemproperty
 
-    Map<String, ?> globalProperties = null
+    Map<String, ?> globalProperties = null          //maps to -G, --globalproperty
+    File globalPropertiesFile                       //pass the properties in the files to remote injectors via -G
+    Boolean remote = false                          //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
+    List<String> remoteHosts                        //convenience field, maps to -Jremote_hosts=S1,S2,S3...
+    List<String> remoteStart                        //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
+    Boolean remoteExit = false                      //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
 
     File customReportXslt
 
     Boolean ignoreErrors = null
     Boolean ignoreFailures = null
-    Boolean remote = false
     Boolean enableReports = null
     Boolean enableExtendedReports = null
 
@@ -42,5 +46,6 @@ class JMPluginExtension {
     File workDir = null
     File reportDir = null
     List<File> jmResultFiles = null
+
 
 }

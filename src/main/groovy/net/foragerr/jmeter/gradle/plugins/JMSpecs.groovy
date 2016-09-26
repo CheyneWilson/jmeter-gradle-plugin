@@ -154,7 +154,7 @@ class JMSpecs implements Serializable{
         if (systemProperties != null) {
             systemProperties.each { k,v ->
                 k.replaceAll(" ", "\\ ")
-                args.add("-D$k=\"$v\"")
+                args.add("-D$k=${v}")
             }
         }
 

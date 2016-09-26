@@ -1,6 +1,7 @@
 package net.foragerr.jmeter.gradle.plugins.worker
 
 import groovy.io.FileType
+import org.gradle.internal.os.OperatingSystem;
 import net.foragerr.jmeter.gradle.plugins.JMSpecs
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
@@ -10,31 +11,90 @@ import java.util.jar.Attributes
 import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 
+/**
+ * The JMeterRunner executes a JMSpec using JMeter
+ */
 class JMeterRunner {
 
     private final static Logger LOGGER = Logging.getLogger(JMeterRunner.class)
 
-    private void launchProcess(ProcessBuilder processBuilder, String workingDirectory) {
-        processBuilder.redirectErrorStream(true)
-        processBuilder.directory(new File(workingDirectory))
+    /**
+     * Launch a process from the supplied processBuilder
+     *
+     * @param processBuilder The processBuilder to create a process from
+     */
+    private void launchProcess(ProcessBuilder processBuilder) {
         Process p = processBuilder.start()
-        p.inputStream.eachLine {println it}
+        p.inputStream.eachLine {println it}  // Write the output to the console
         int processResult = p.waitFor()
         if (processResult != 0) {
             throw new GradleException("Something went wrong during jmeter test execution, Please see jmeter logs for more information")
         }
     }
 
-    void executeJmeterCommand(JMSpecs specs ) {
-        ProcessBuilder processBuilder = new ProcessBuilder(createArgumentList(specs, "org.apache.jmeter.NewDriver")).inheritIO()
-        launchProcess(processBuilder, specs.workDir.getAbsolutePath());
+    /**
+     * Run JMeter with the test configuration provided using the chosen runner
+     *
+     * @param specs This contains the test configuration to run.
+     * @param runnerType The type of JMeter instance to run the specs on. Can be one of
+     *     GRADLE_PLUGIN,    // Use the JMeter bundled with this plugin
+     *     SYSTEM_PATH,      // Use the JMeter installed under %PATH% or $PATH
+     *     JMETER_BIN        // Use the JMeter installed under %JMETER_BIN% or $JMETER_BIN
+     */
+    void executeJmeterCommand(JMSpecs specs, JMeterRunnerType runnerType) {
+        List<String> argumentsList
+
+        switch (runnerType) {
+
+            case JMeterRunnerType.GRADLE_PLUGIN:
+                argumentsList = createArgumentList(specs)
+                break
+
+            case [JMeterRunnerType.JMETER_BIN, JMeterRunnerType.SYSTEM_PATH]:
+                argumentsList = new ArrayList<>()
+                String jmeter = "jmeter"
+
+                if(runnerType == JMeterRunnerType.JMETER_BIN){
+                    String jmeterBin = System.getenv()['JMETER_BIN']
+                    jmeter = "${jmeterBin}jmeter"
+                }
+
+                if (OperatingSystem.current().isWindows()){
+                    argumentsList.addAll(['cmd', '/c', jmeter])
+                } else {
+                    argumentsList.addAll(['sh', '-c', jmeter])
+                }
+
+                argumentsList.addAll(specs.getJmeterCommandLineArguments())
+                break
+
+            default:
+                LOGGER.error("Unknown JMeterRunnerType")  //  Shouldn't occur
+        }
+
+        ProcessBuilder processBuilder = new ProcessBuilder(argumentsList as String[])
+        processBuilder.inheritIO()
+        processBuilder.directory(specs.workDir)
+        processBuilder.redirectErrorStream(true)
+        if(runnerType == JMeterRunnerType.JMETER_BIN || runnerType == JMeterRunnerType.SYSTEM_PATH ) {
+            processBuilder.environment().put("JVM_ARGS", specs.getJavaCommandLineArguments().join(" "))
+        }
+
+        launchProcess(processBuilder);
     }
 
-    private String[] createArgumentList(JMSpecs specs, String launchClass) {
-        String javaRuntime = "java"
+    /**
+     * Create the argument list used by the JMETER_PLUGIN runner
+     *
+     * @param specs This contains the test configuration to run.
+     * @return A list of arguments that can be supplied to a ProcessBuilder
+     */
+    private List<String> createArgumentList(JMSpecs specs) {
+        final String JAVA_RUNTIME = "java"
+        final String LAUNCH_CLASS = "org.apache.jmeter.NewDriver"  // This hasn't changed in years
 
         List<String> argumentsList = new ArrayList<>()
-        argumentsList.add(javaRuntime)
+        argumentsList.add(JAVA_RUNTIME)
 
         argumentsList.addAll(specs.getJavaCommandLineArguments())
 
@@ -44,14 +104,14 @@ class JMeterRunner {
             workDir + File.separator + "lib" + File.separator + "ext" + System.getProperty("path.separator") +
             generatePatherJar(workDir).getAbsolutePath())
 
-        argumentsList.add(launchClass)
+        argumentsList.add(LAUNCH_CLASS)
         List<String>  args = specs.getJmeterCommandLineArguments()
         LOGGER.info("JMeter is called with the following command line arguments: " + args.toString());
         argumentsList.addAll(args)
 
         LOGGER.debug("Command to run is $argumentsList")
 
-        return argumentsList as String[]
+        return argumentsList
     }
 
     /**

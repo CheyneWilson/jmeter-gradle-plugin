@@ -1,5 +1,7 @@
 package net.foragerr.jmeter.gradle.plugins
 
+import net.foragerr.jmeter.gradle.plugins.worker.JMeterRunnerType
+
 class JMPluginExtension {
 
     List<File> testFiles = null                      //maps to -t, --testfile
@@ -47,5 +49,5 @@ class JMPluginExtension {
     File reportDir = null
     List<File> jmResultFiles = null
 
-
+    JMeterRunnerType runnerType = JMeterRunnerType.GRADLE_PLUGIN
 }

@@ -28,13 +28,13 @@ class TaskJMRun extends TaskJMExec {
             else {
                 for (File testFile : testFiles) {
                     JMSpecs testConfig = setupTestConfig(testFile);
-                    resultList.add(executeJmeterTest(testConfig));
+                    resultList.add(executeJMeterScript(testConfig, project.jmeter.runnerType));
                 }
             }
         } else {
             // Run the test defined in the task instead of in the jmeter config
             JMSpecs testConfig = setupTestConfig(testFile);
-            resultFile = executeJMeterScript(testConfig)
+            resultFile = executeJMeterScript(testConfig, project.jmeter.runnerType)
             resultList.add(resultFile);
         }
         //Scan for errors

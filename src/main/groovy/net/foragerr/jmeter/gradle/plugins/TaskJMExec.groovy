@@ -2,6 +2,7 @@ package net.foragerr.jmeter.gradle.plugins
 
 import net.foragerr.jmeter.gradle.plugins.utils.JMUtils
 import net.foragerr.jmeter.gradle.plugins.worker.JMeterRunner
+import net.foragerr.jmeter.gradle.plugins.worker.JMeterRunnerType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 //import org.gradle.api.internal.AbstractTask
@@ -105,12 +106,12 @@ class TaskJMExec extends DefaultTask {
      *
      * @return A results file from the JMeter execution
      */
-    protected static File executeJMeterScript(JMSpecs testConfig) {
+    protected static File executeJMeterScript(JMSpecs testConfig, JMeterRunnerType runnerType) {
         try {
             LOG.info("Executing jMeter test : ${testConfig.testFile?.getCanonicalPath()}")
             testConfig.resultFile?.delete();
 
-            new JMeterRunner().executeJmeterCommand(testConfig);
+            new JMeterRunner().executeJmeterCommand(testConfig, runnerType);
             return testConfig.resultFile;
 
         } catch (IOException e) {

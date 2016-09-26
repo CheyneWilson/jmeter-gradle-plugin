@@ -31,7 +31,7 @@ class TaskJMGui extends TaskJMExec {
             testConfig = setupTestConfig(testFile);
         }
 
-        executeJMeterScript(testConfig);
+        executeJMeterScript(testConfig, project.jmeter.runnerType);
     }
 
 

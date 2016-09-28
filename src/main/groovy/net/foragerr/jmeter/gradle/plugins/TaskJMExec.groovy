@@ -35,10 +35,12 @@ class TaskJMExec extends DefaultTask {
     Map<String, ?> globalProperties = null      //maps to -G, --globalproperty
     File globalPropertiesFile    = null         //pass the properties in the file to remote injectors via -G
 
-    Boolean remote = false                      //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
+    boolean remote = false                      //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
     List<String> remoteHosts                    //convenience field, maps to -Jremote_hosts=S1,S2,S3...
     List<String> remoteStart                    //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
     Boolean remoteExit = false                  //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
+
+    boolean nongui = false                      //maps to -n, --nongui,    run JMeter in nongui mode
 
     File workDir = null
 
@@ -81,6 +83,7 @@ class TaskJMExec extends DefaultTask {
         testConfig.remoteStart = remoteStart ?: project.jmeter.remoteStart
         testConfig.remoteExit = remoteExit ?: project.jmeter.remoteExit
 
+        testConfig.nongui = nongui ?: project.jmeter.nongui
 
         // TODO: Decide when/where these get set
         testConfig.getSystemProperties().put("search_paths", System.getProperty("search_paths"));

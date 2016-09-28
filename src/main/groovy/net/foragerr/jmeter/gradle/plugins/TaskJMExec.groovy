@@ -40,8 +40,6 @@ class TaskJMExec extends DefaultTask {
     List<String> remoteStart                    //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
     Boolean remoteExit = false                  //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
 
-    boolean nongui = false                      //maps to -n, --nongui,    run JMeter in nongui mode
-
     File workDir = null
 
     File jmeterLogFile = null
@@ -82,8 +80,6 @@ class TaskJMExec extends DefaultTask {
         testConfig.remoteHosts = remoteHosts ?: project.jmeter.remoteHosts
         testConfig.remoteStart = remoteStart ?: project.jmeter.remoteStart
         testConfig.remoteExit = remoteExit ?: project.jmeter.remoteExit
-
-        testConfig.nongui = nongui ?: project.jmeter.nongui
 
         // TODO: Decide when/where these get set
         testConfig.getSystemProperties().put("search_paths", System.getProperty("search_paths"));

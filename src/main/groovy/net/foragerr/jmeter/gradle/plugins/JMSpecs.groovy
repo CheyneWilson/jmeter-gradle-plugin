@@ -31,9 +31,8 @@ class JMSpecs implements Serializable{
     Boolean remote = false                          //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
     List<String> remoteHosts                        //convenience field, maps to -Jremote_hosts=S1,S2,S3...
     List<String> remoteStart                        //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
-    boolean remoteExit = false                      //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
-    boolean nongui                                  //maps to -n, --nongui,    run JMeter in nongui mode
-
+    Boolean remoteExit = false                      //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
+    Boolean nongui                                  //maps to -n, --nongui,    run JMeter in nongui mode
 
     Boolean ignoreErrors = null
     Boolean ignoreFailures = null

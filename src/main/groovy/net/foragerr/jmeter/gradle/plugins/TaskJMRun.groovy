@@ -11,6 +11,8 @@ class TaskJMRun extends TaskJMExec {
 
     static final Logger LOG = Logging.getLogger(getClass());
 
+    Boolean  nongui = false                      //maps to -n, --nongui,    run JMeter in nongui mode
+
     @TaskAction
     jmRun() {
         //Run Tests
@@ -40,6 +42,12 @@ class TaskJMRun extends TaskJMExec {
         //Scan for errors
         checkForErrors(resultList);
         project.jmeter.jmResultFiles = resultList;
+    }
+
+    protected  JMSpecs  setupTestConfig(File testFile){
+        JMSpecs testConfig = super.setupTestConfig(testFile)
+        testConfig.nongui = nongui ?: project.jmeter.nongui
+        return testConfig
     }
 
     private void checkForErrors(List<File> results) {

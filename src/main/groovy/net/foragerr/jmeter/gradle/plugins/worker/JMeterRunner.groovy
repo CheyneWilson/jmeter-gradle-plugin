@@ -72,6 +72,7 @@ class JMeterRunner {
                 LOGGER.error("Unknown JMeterRunnerType")  //  Shouldn't occur
         }
 
+        LOGGER.info("JMeter is called with the following command line arguments: " + argumentsList.toString());
         ProcessBuilder processBuilder = new ProcessBuilder(argumentsList as String[])
         processBuilder.inheritIO()
         processBuilder.directory(specs.workDir)

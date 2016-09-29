@@ -78,6 +78,7 @@ class JMeterRunner {
         processBuilder.directory(specs.workDir)
         processBuilder.redirectErrorStream(true)
         if(runnerType == JMeterRunnerType.JMETER_BIN || runnerType == JMeterRunnerType.SYSTEM_PATH ) {
+            LOGGER.debug("JVM_ARGS: ${specs.getJavaCommandLineArguments()}")
             processBuilder.environment().put("JVM_ARGS", specs.getJavaCommandLineArguments().join(" "))
         }
 
@@ -97,6 +98,7 @@ class JMeterRunner {
         List<String> argumentsList = new ArrayList<>()
         argumentsList.add(JAVA_RUNTIME)
 
+        argumentsList.addAll(getGradlePluginCommandLineArguments())
         argumentsList.addAll(specs.getJavaCommandLineArguments())
 
         argumentsList.add("-cp")
@@ -149,5 +151,19 @@ class JMeterRunner {
         JarOutputStream target = new JarOutputStream(new FileOutputStream(patherJar.getCanonicalPath()), manifest);
         target.close();
         return patherJar
+    }
+
+    /**
+     *
+     * @return config used only by the JMeterRunner JMeterRunnerType.GRADLE_PLUGIN
+     */
+    private List<String> getGradlePluginCommandLineArguments () {
+
+        List<String> args = new ArrayList<String>();
+        args.add("-Dsearch_paths=${System.getProperty("search_paths")}")
+        args.add("-Dsaveservice_properties=${System.getProperty("saveservice_properties")}")
+        args.add("-Dupgrade_properties=${System.getProperty("upgrade_properties")}")
+
+        return args
     }
 }

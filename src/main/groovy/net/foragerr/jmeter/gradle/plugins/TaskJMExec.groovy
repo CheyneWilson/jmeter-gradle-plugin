@@ -82,10 +82,7 @@ class TaskJMExec extends DefaultTask {
         testConfig.remoteExit = remoteExit ?: project.jmeter.remoteExit
 
         // TODO: Decide when/where these get set
-        testConfig.getSystemProperties().put("search_paths", System.getProperty("search_paths"));
         testConfig.getSystemProperties().put("jmeter.home", testConfig.workDir.getAbsolutePath());
-        testConfig.getSystemProperties().put("saveservice_properties", System.getProperty("saveservice_properties"));
-        testConfig.getSystemProperties().put("upgrade_properties", System.getProperty("upgrade_properties"));
         testConfig.getSystemProperties().put("log_file", testConfig.jmeterLogFile);
         testConfig.getSystemProperties().put("jmeter.save.saveservice.output_format", "xml");
 

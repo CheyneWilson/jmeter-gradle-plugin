@@ -62,7 +62,7 @@ class JMeterRunner {
                 if (OperatingSystem.current().isWindows()){
                     argumentsList.addAll(['cmd', '/c', jmeter])
                 } else {
-                    argumentsList.addAll(['sh', '-c', jmeter])
+                    argumentsList.addAll(['sh', jmeter])
                 }
 
                 argumentsList.addAll(specs.getJmeterCommandLineArguments())

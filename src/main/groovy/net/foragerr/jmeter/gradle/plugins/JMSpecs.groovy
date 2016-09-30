@@ -112,16 +112,10 @@ class JMSpecs implements Serializable{
         }
 
         if (globalPropertiesFile != null) {
-            globalPropertiesFile.withInputStream {
-                properties.load(it)
-            }
-
-            globalPropertiesFile.each {
-                println("-G{$it.key}=${it.value}")
-                args.add("-G{$it.key}=${it.value}")
-            }
+            args.add("-G${globalPropertiesFile.getCanonicalPath()}")
         }
 
+        // TODO: Test how this interacts with 'globalPropertiesFile' being set at the same time as it may not work ..
         if (globalProperties != null) {
             globalProperties.each {k,v ->
                 k.replaceAll(" ", "\\ ")

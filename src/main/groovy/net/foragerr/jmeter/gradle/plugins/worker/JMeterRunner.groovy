@@ -56,6 +56,9 @@ class JMeterRunner {
 
                 if(runnerType == JMeterRunnerType.JMETER_BIN){
                     String jmeterBin = System.getenv()['JMETER_BIN']
+                    if (jmeterBin == null) {
+                        LOGGER.error("Environment variable JMETER_BIN not set.")
+                    }
                     jmeter = "${jmeterBin}jmeter"
                 }
 

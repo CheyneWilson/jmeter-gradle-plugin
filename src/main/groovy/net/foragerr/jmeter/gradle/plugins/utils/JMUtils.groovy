@@ -1,6 +1,7 @@
 package net.foragerr.jmeter.gradle.plugins.utils
 
 import groovy.util.logging.Slf4j
+import net.foragerr.jmeter.gradle.plugins.JMSpecs
 import org.apache.tools.ant.DirectoryScanner
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -60,8 +61,15 @@ class JMUtils {
         }
     }
 
-	static File getResultFile(File testFile, Project project) {
-        if (testFile == null){
+    /**
+     * Generate a file for the test results
+     *
+     * @param testConfig  The test config to get the resultFile for
+     * @param project
+     * @return A file to be used for test results
+     */
+	static File getResultFile(JMSpecs testConfig, Project project) {
+        if (testConfig.testFile == null){
             return null
         }
         DateFormat defaultFmt = new SimpleDateFormat("yyyyMMdd-HHmm");
@@ -69,12 +77,12 @@ class JMUtils {
 		if (project.jmeter.resultFilenameTimestamp.equals("useSaveServiceFormat")){
 			String saveServiceFormat =  System.getProperty("jmeter.save.saveservice.timestamp_format");
 			if (saveServiceFormat.equals("none")) {
-                return new File(project.jmeter.reportDir, "${testFile.getName()}.xml");
+                return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
             }
 			try
 			{
                 DateFormat saveFormat = new SimpleDateFormat(saveServiceFormat);
-				return new File(project.jmeter.reportDir, "${testFile.getName()}-${saveFormat.format(new Date())}.xml");
+				return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${saveFormat.format(new Date())}.xml");
 			}
 			catch (Exception e)
 			{
@@ -85,14 +93,14 @@ class JMUtils {
 
         //if resultFilenameTimestamp is "none" do not use a timestamp in filename
         else if (project.jmeter.resultFilenameTimestamp.equals("none")) {
-            return new File(project.jmeter.reportDir, "${testFile.getName()}.xml");
+            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
         }
 
         else if (project.jmeter.resultFilenameTimestamp==null) {
-            return new File(project.jmeter.reportDir, "${testFile.getName()}-${defaultFmt.format(new Date())}.xml");
+            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.xml");
         }
 
-        return new File(project.jmeter.reportDir, "${testFile.getName()}-${defaultFmt.format(new Date())}.xml");
+        return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.xml");
     }
 
 	

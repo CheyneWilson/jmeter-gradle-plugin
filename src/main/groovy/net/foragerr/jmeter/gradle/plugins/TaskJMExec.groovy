@@ -40,6 +40,8 @@ class TaskJMExec extends DefaultTask {
     List<String> remoteStart                    //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
     Boolean remoteExit = false                  //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
 
+    File reportDir = null
+
     File workDir = null
 
     File jmeterLogFile = null
@@ -59,9 +61,12 @@ class TaskJMExec extends DefaultTask {
     protected JMSpecs setupTestConfig(File testFile){
         JMSpecs testConfig = new JMSpecs();
         testConfig.testFile = testFile
-        testConfig.resultFile = resultFile ?: JMUtils.getResultFile(testFile, project)
 
+
+        testConfig.reportDir = reportDir ?: project.jmeter.reportDir
         testConfig.workDir = workDir ?: project.jmeter.workDir
+        testConfig.resultFile = resultFile ?: JMUtils.getResultFile(testConfig, project)
+
 
         testConfig.jmeterLogFile = jmeterLogFile ?: project.jmeter.jmeterLogFile
 

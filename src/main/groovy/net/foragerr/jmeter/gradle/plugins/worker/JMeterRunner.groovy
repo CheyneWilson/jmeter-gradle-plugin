@@ -42,7 +42,7 @@ class JMeterRunner {
      *     JMETER_BIN        // Use the JMeter installed under %JMETER_BIN% or $JMETER_BIN
      */
     void executeJmeterCommand(JMSpecs specs, JMeterRunnerType runnerType) {
-        List<String> argumentsList
+        List<String> argumentsList = new ArrayList<>()
 
         switch (runnerType) {
 
@@ -51,7 +51,6 @@ class JMeterRunner {
                 break
 
             case [JMeterRunnerType.JMETER_BIN, JMeterRunnerType.SYSTEM_PATH]:
-                argumentsList = new ArrayList<>()
                 String jmeter = "jmeter"
 
                 if(runnerType == JMeterRunnerType.JMETER_BIN){
@@ -75,7 +74,7 @@ class JMeterRunner {
                 LOGGER.error("Unknown JMeterRunnerType")  //  Shouldn't occur
         }
 
-        LOGGER.info("JMeter is called with the following command line arguments: " + argumentsList.toString());
+        LOGGER.info("JMeter is called with the following command line arguments: " + argumentsList.toString())
         ProcessBuilder processBuilder = new ProcessBuilder(argumentsList as String[])
         processBuilder.inheritIO()
         processBuilder.directory(specs.workDir)
@@ -85,7 +84,7 @@ class JMeterRunner {
             processBuilder.environment().put("JVM_ARGS", specs.getJavaCommandLineArguments().join(" "))
         }
 
-        launchProcess(processBuilder);
+        launchProcess(processBuilder)
     }
 
     /**
@@ -112,7 +111,7 @@ class JMeterRunner {
 
         argumentsList.add(LAUNCH_CLASS)
         List<String>  args = specs.getJmeterCommandLineArguments()
-        LOGGER.info("JMeter is called with the following command line arguments: " + args.toString());
+        LOGGER.info("JMeter is called with the following command line arguments: ${args.toString()}")
         argumentsList.addAll(args)
 
         LOGGER.debug("Command to run is $argumentsList")
@@ -151,8 +150,8 @@ class JMeterRunner {
             cpBuilder.append(" ")
         }
         manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH, cpBuilder.substring(0, cpBuilder.size() - 1) )
-        JarOutputStream target = new JarOutputStream(new FileOutputStream(patherJar.getCanonicalPath()), manifest);
-        target.close();
+        JarOutputStream target = new JarOutputStream(new FileOutputStream(patherJar.getCanonicalPath()), manifest)
+        target.close()
         return patherJar
     }
 

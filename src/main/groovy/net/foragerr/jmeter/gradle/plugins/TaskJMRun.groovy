@@ -30,7 +30,7 @@ class TaskJMRun extends TaskJMExec {
             else {
                 for (File testFile : testFiles) {
                     JMSpecs testConfig = setupTestConfig(testFile);
-                    resultList.add(executeJMeterScript(testConfig, project.jmeter.runnerType));
+                    resultList.add(executeJMeterScript(testConfig, project.jmeter.runnerType))
                 }
             }
         } else {
@@ -44,6 +44,7 @@ class TaskJMRun extends TaskJMExec {
         project.jmeter.jmResultFiles = resultList;
     }
 
+    @Override
     protected  JMSpecs  setupTestConfig(File testFile){
         JMSpecs testConfig = super.setupTestConfig(testFile)
         testConfig.nongui = nongui ?: project.jmeter.nongui
@@ -51,7 +52,7 @@ class TaskJMRun extends TaskJMExec {
     }
 
     private void checkForErrors(List<File> results) {
-        ErrorScanner scanner = new ErrorScanner(project.jmeter.ignoreErrors, project.jmeter.ignoreFailures);
+        ErrorScanner scanner = new ErrorScanner(project.jmeter.ignoreErrors, project.jmeter.ignoreFailures)
         try {
             for (File file : results) {
                 if (scanner.scanForProblems(file)) {

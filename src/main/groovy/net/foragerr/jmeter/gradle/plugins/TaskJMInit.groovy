@@ -15,6 +15,7 @@ class TaskJMInit extends DefaultTask {
     private String jmeterVersion
     private String jmeterPluginsVersion
 
+
     @TaskAction
     jmInit() {
 
@@ -35,8 +36,10 @@ class TaskJMInit extends DefaultTask {
 
         project.jmeter.ignoreErrors = project.jmeter.ignoreErrors == null ? true : project.jmeter.ignoreErrors
         project.jmeter.ignoreFailures = project.jmeter.ignoreFailures == null ? true : project.jmeter.ignoreFailures
+
         project.jmeter.enableReports = project.jmeter.enableReports == null ? false : project.jmeter.enableReports
         project.jmeter.enableExtendedReports = project.jmeter.enableExtendedReports == null ? true : project.jmeter.enableExtendedReports
+
         loadPluginProperties()
         project.jmeter.jmVersion = this.jmeterVersion
 
@@ -59,6 +62,7 @@ class TaskJMInit extends DefaultTask {
         log.info("   jmeter jp@gc plugins version: ${this.jmeterPluginsVersion}");
         log.info("------------------------")
     }
+
 
     protected void initTempProperties() throws IOException {
         List<File> tempProperties = new ArrayList<File>();
@@ -88,11 +92,12 @@ class TaskJMInit extends DefaultTask {
                 writer.flush();
                 writer.close();
             } catch (IOException ioe) {
-                throw new GradleException("Couldn't create temporary property file " + f.getName() + " in directory " + workDir.getPath(), ioe);
+                throw new GradleException("Couldn't create temporary property file ${f.getName()} in directory ${project.jmeter.workDir.getPath()}", ioe);
             }
 
         }
     }
+
 
     protected void resolveJmeterSearchPath() {
         StringBuilder cp = new StringBuilder()
@@ -117,6 +122,7 @@ class TaskJMInit extends DefaultTask {
         System.setProperty("search_paths", cp.toString());
         log.debug("Search path is set to " + System.getProperty("search_paths"))
     }
+
 
     private void loadPluginProperties() {
         log.debug("Plugins properties file is: ${this.getClass().getClassLoader().getResource("jmeter-plugin.properties")}")

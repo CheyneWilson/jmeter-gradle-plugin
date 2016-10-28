@@ -18,12 +18,13 @@ class JMSpecs implements Serializable{
     String maxHeapSize
     String minHeapSize
 
-    File propFile = null                        //maps to -p, --propfile
+    File propFile = null                        // maps to -p, --propfile
+
     List<File> addPropFiles = null              //maps to -q, --addprop
     Map<String, ?> jmeterProperties = null      //maps to -J, --jmeterproperty
 
-    List<File> systemPropertiesFiles = null                    // maps to -S, --systemPropertyFile
-    Map<String, ?> systemProperties = new HashMap<>()          // maps to -D, --systemproperty
+    List<File> systemPropertiesFiles = null         // maps to -S, --systemPropertyFile
+    Map<String, ?> systemProperties = null          // maps to -D, --systemproperty
 
     Map<String, ?> globalProperties = null          //maps to -G, --globalproperty
     File globalPropertiesFile                       //pass the properties in the files to remote injectors via -G
@@ -73,8 +74,8 @@ class JMSpecs implements Serializable{
         }
 
         args.addAll(Arrays.asList(
-                "-p", propFile.getCanonicalPath()
-        ));
+            "-p", propFile.getCanonicalPath()
+        ))
 
         if(remoteStart != null){
             args.add("-R${remoteStart.join(",")}");
@@ -93,7 +94,7 @@ class JMSpecs implements Serializable{
         if (addPropFiles) {
             for (File addPropFile : addPropFiles) {
                 if (addPropFile.exists() && addPropFile.isFile()) {
-                    args.addAll(Arrays.asList("-q", addPropFile.getCanonicalPath()));
+                    args.addAll(Arrays.asList("-q", addPropFile.getCanonicalPath()))
                 } else {
                     LOG.warn("Addtional Property File ${addPropFile} was not valid.")
                 }

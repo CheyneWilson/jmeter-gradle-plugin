@@ -31,7 +31,7 @@ public class JMeterPluginProperties {
     public static String getProperty(String name) {
         String value = getPluginProperties().getProperty(name);
         if (value == null) {
-            throw new GradleException("Property " + name + " is not set in jmeter-plugin.properties");
+            throw new GradleException("Property {name} is not set in jmeter-plugin.properties");
         }
 
         return value;

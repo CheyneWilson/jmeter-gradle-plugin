@@ -34,7 +34,7 @@ class JMUtils {
 
             log.info("includes: ${includes}")
             log.info("excludes: ${excludes}")
-            testFiles.addAll(JMUtils.scanDir(project, includes, excludes, project.jmeter.testFileDir));
+            testFiles.addAll(scanDir(project, includes, excludes, project.jmeter.testFileDir));
             log.info(testFiles.size() + " test files found in folder scan")
         }
 
@@ -42,22 +42,25 @@ class JMUtils {
     }
 
     static File getJmeterPropsFile(Project project) {
-        File propsInSrcDir = new File(project.jmeter.testFileDir,"jmeter.properties");
+        File propsInSrcDir = new File(project.jmeter.testFileDir, "jmeter.properties")
 
         //1. Is jmeterPropertyFile defined?
         if (project.jmeter.propFile != null) {
-            return project.jmeter.propFile;
+            log.info("Using property file defined in jmeter block (from build.gradle), ${project.jmeter.propFile}")
+            return project.jmeter.propFile
         }
 
         //2. Does jmeter.properties exist in $srcDir/test/jmeter
         else if (propsInSrcDir.exists()) {
-            return propsInSrcDir;
+            log.info("Using property file ${propsInSrcDir}")
+            return propsInSrcDir
         }
 
-        //3. If neither, use the default jmeter.properties
+        //3. If neither, use the default jmeter.properties, usually in build/jmeter
         else{
-            File defPropsFile = new File(project.jmeter.workDir, System.getProperty("default_jm_properties"));
-            return defPropsFile;
+            File defPropsFile = new File(project.jmeter.workDir, "jmeter.properties")
+            log.info("Using property file ${defPropsFile}")
+            return defPropsFile
         }
     }
 
@@ -74,9 +77,9 @@ class JMUtils {
         }
         DateFormat defaultFmt = new SimpleDateFormat("yyyyMMdd-HHmm");
 		//if resultFilenameTimestamp is "useSaveServiceFormat" use saveservice.format
-		if (project.jmeter.resultFilenameTimestamp.equals("useSaveServiceFormat")){
+		if (project.jmeter.resultFilenameTimestamp == "useSaveServiceFormat"){
 			String saveServiceFormat =  System.getProperty("jmeter.save.saveservice.timestamp_format");
-			if (saveServiceFormat.equals("none")) {
+			if (saveServiceFormat == "none") {
                 return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
             }
 			try
@@ -92,11 +95,11 @@ class JMUtils {
 		}
 
         //if resultFilenameTimestamp is "none" do not use a timestamp in filename
-        else if (project.jmeter.resultFilenameTimestamp.equals("none")) {
+        else if (project.jmeter.resultFilenameTimestamp == "none") {
             return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
         }
 
-        else if (project.jmeter.resultFilenameTimestamp==null) {
+        else if (project.jmeter.resultFilenameTimestamp == null) {
             return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.xml");
         }
 
@@ -104,7 +107,7 @@ class JMUtils {
     }
 
 	
-    static  List<File> scanDir(Project project, String[] includes, String[] excludes, File baseDir) {
+    static  List<File> scanDir(String[] includes, String[] excludes, File baseDir) {
         List<File> scanResults = new ArrayList<File>()
         if (baseDir.exists()) {
             DirectoryScanner scanner = new DirectoryScanner()

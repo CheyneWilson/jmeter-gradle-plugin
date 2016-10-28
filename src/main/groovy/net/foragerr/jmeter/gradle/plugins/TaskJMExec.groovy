@@ -30,10 +30,10 @@ class TaskJMExec extends DefaultTask {
     Map<String, ?> jmeterProperties = null      //maps to -J, --jmeterproperty
 
     List<File> systemPropertiesFiles = null     //maps to -S, --systemPropertyFile
-    Map<String, ?> systemProperties = null      //maps to -D, --systemproperty
+    Map<String, String> systemProperties = null //maps to -D, --systemproperty
 
     Map<String, ?> globalProperties = null      //maps to -G, --globalproperty
-    File globalPropertiesFile    = null         //pass the properties in the file to remote injectors via -G
+    File globalPropertiesFile = null            //pass the properties in the file to remote injectors via -G
 
     boolean remote = false                      //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
     List<String> remoteHosts                    //convenience field, maps to -Jremote_hosts=S1,S2,S3...
@@ -50,8 +50,6 @@ class TaskJMExec extends DefaultTask {
     String minHeapSize
 
 
-
-
     /**
      * Create a new JMSpecs file from the in
      *
@@ -59,22 +57,19 @@ class TaskJMExec extends DefaultTask {
      * @return
      */
     protected JMSpecs setupTestConfig(File testFile){
-        JMSpecs testConfig = new JMSpecs();
+        JMSpecs testConfig = new JMSpecs()
         testConfig.testFile = testFile
-
 
         testConfig.reportDir = reportDir ?: project.jmeter.reportDir
         testConfig.workDir = workDir ?: project.jmeter.workDir
         testConfig.resultFile = resultFile ?: JMUtils.getResultFile(testConfig, project)
-
 
         testConfig.jmeterLogFile = jmeterLogFile ?: project.jmeter.jmeterLogFile
 
         testConfig.propFile  = propFile ?: JMUtils.getJmeterPropsFile(project)
 
         testConfig.addPropFiles = addPropFiles ?: project.jmeter.addPropFiles
-
-        testConfig.jmeterProperties = jmeterProperties ?: project.jmeter.jmeterProperties
+        testConfig.jmeterProperties = jmeterProperties ?: project.jmeter.jmeterProperties ?: new HashMap<String, ?>()
 
         testConfig.systemPropertiesFiles = systemPropertiesFiles ?: project.jmeter.systemPropertiesFiles
         testConfig.systemProperties = systemProperties ?: project.jmeter.systemProperties ?: new HashMap<String, ?>()
@@ -87,9 +82,12 @@ class TaskJMExec extends DefaultTask {
         testConfig.remoteExit = remoteExit ?: project.jmeter.remoteExit
 
         // TODO: Decide when/where these get set
-        testConfig.getSystemProperties().put("jmeter.home", testConfig.workDir.getAbsolutePath());
-        testConfig.getSystemProperties().put("log_file", testConfig.jmeterLogFile);
-        testConfig.getSystemProperties().put("jmeter.save.saveservice.output_format", "xml");
+        testConfig.systemProperties.put("jmeter.home", testConfig.workDir.getAbsolutePath())
+        testConfig.systemProperties.put("log_file", testConfig.jmeterLogFile.getAbsolutePath())
+
+        // TODO: would prefer if jmeter.save.saveservice.output_format was in a properties file, ideally user.properties
+        // Have set it in the jmeter.properties file in the interim
+        // testConfig.jmeterProperties.put("jmeter.save.saveservice.output_format", "xml")
 
         testConfig.maxHeapSize = maxHeapSize ?: project.jmeter.maxHeapSize
         testConfig.minHeapSize = minHeapSize ?: project.jmeter.minHeapSize
@@ -110,13 +108,13 @@ class TaskJMExec extends DefaultTask {
     protected static File executeJMeterScript(JMSpecs testConfig, JMeterRunnerType runnerType) {
         try {
             LOG.info("Executing jMeter test : ${testConfig.testFile?.getCanonicalPath()}")
-            testConfig.resultFile?.delete();
+            testConfig.resultFile?.delete()
 
-            new JMeterRunner().executeJmeterCommand(testConfig, runnerType);
-            return testConfig.resultFile;
+            new JMeterRunner().executeJmeterCommand(testConfig, runnerType)
+            return testConfig.resultFile
 
         } catch (IOException e) {
-            throw new GradleException("Can't execute test", e);
+            throw new GradleException("Can't execute test", e)
         }
     }
 

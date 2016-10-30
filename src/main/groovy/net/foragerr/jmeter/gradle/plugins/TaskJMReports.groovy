@@ -10,6 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
@@ -26,15 +27,13 @@ public class TaskJMReports extends DefaultTask {
 
     protected final Logger log = Logging.getLogger(getClass())
 
-    File reportDir = null
+    @InputDirectory
+    @Optional
+    File reportDir
 
     List<ReportSpecs> reports = new ArrayList<>()
 
 //	TODO: createReports should only kick-in if there are new jtl files to process.
-//	@InputDirectory
-//	def File project.jmeter.reportDir
-
-//    PluginsCMDWorker worker
 
     @InputFile
     @Optional
@@ -45,7 +44,7 @@ public class TaskJMReports extends DefaultTask {
 
         List<File> jmResultFiles = new ArrayList<File>()
 
-        reportDir = project.jmeter.reportDir ?: new File(project.buildDir, "jmeter-report")
+        reportDir = reportDir ?: project.jmeter.reportDir ?: new File(project.buildDir, "jmeter-report")
         if (resultFile != null) {
             jmResultFiles.add(resultFile)
         }

@@ -50,7 +50,7 @@ public class TaskJMReports extends DefaultTask {
         }
 		else {
             //Get List of resultFiles
-            jmResultFiles.addAll(JMUtils.scanDir(project, ["**/*.xml"] as String[], [] as String[], reportDir));
+            jmResultFiles.addAll(JMUtils.scanDir(["**/*.xml"] as String[], [] as String[], reportDir));
         }
 
         // If no reports are specified, use all values in report types

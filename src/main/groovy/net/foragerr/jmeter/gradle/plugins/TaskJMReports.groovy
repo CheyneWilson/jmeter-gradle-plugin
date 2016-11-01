@@ -143,7 +143,7 @@ public class TaskJMReports extends DefaultTask {
         try {
             worker.setInputFile(resultFile.getAbsolutePath());
             worker.setPluginType(specs.pluginType);
-            worker.addExportMode(specs.getOutputMode());
+            worker.addExportMode(specs.getOutputMode())
 
             if (specs.mode.contains(ReportSpecs.GraphMode.PNG)){
                 worker.setOutputPNGFile(imgDir.getCanonicalPath() + File.separator + "${specs.outputFileName}.png");
@@ -261,8 +261,9 @@ public class TaskJMReports extends DefaultTask {
 //      Don't really need the complexity of using scan dir at the includePattern is now just file names
 //      File[] listOfImages = JMUtils.scanDir(includePattern, [] as String[], imgDir)
 
-        IOUtils.copy(this.getClass().getClassLoader().getResourceAsStream("reports/assets/style.css"),
-                     new FileOutputStream(reportDir.getPath() + "/assets/style.css"))
+        new File(reportDir.getPath(), "assets").mkdirs()
+        FileOutputStream fos = new FileOutputStream(reportDir.getPath() + "/assets/style.css")
+        IOUtils.copy(this.getClass().getClassLoader().getResourceAsStream("reports/assets/style.css"), fos)
 
         //create HTML
         HtmlCanvas html = new HtmlCanvas(new PrettyWriter());

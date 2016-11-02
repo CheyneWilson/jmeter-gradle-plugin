@@ -15,7 +15,6 @@ class ReportSpecs {
 
     String outputFileName             // The name of the output file (excluding extension)
 
-
     Set<GraphMode> mode = EnumSet.allOf(GraphMode) // The mode, CSV and/or PNG
     Integer width                     //  --width <pixels> for PNG only - width of the image, default is 800
     Integer height                    //  --height <pixels> for PNG only - height of the image, default is 600
@@ -41,14 +40,18 @@ class ReportSpecs {
     Integer startOffset               //  --start-offset <sec> include in report only samples with (timestamp - relativeStartTime) > startOffset
     Integer endOffset                 //  --end-offset <sec> include in report only samples with (timestamp - relativeStartTime) < endOffset
 
+
+    ReportSpecs(){
+
+    }
     /**
      * @return An int value that represents CSV and/or PNG used by PluginsCMDWorker
      */
-    public int getOutputMode() {
+    int getOutputMode() {
         int value = 0
-        Iterator<?> i = mode.iterator();
-        for(GraphMode m : i) {
-            value += m.intValue()
+        Iterator<?> i = this.mode.iterator()
+        for(GraphMode m in i) {
+            value += m.value
         }
         return value
     }
@@ -56,25 +59,8 @@ class ReportSpecs {
     /**
      * @return A String representation of the pluginType used by PluginsCMDWorker
      */
-    public String getPluginType() {
+    String getPluginType() {
         return  reportType.toString()
     }
 
-    /**
-     * The mode out output that PluginsCMDWorker supports
-     */
-    enum GraphMode {
-        PNG(PluginsCMDWorker.EXPORT_PNG),
-        CSV(PluginsCMDWorker.EXPORT_CSV)
-
-        private final int mode
-
-        private GraphMode(int mode) {
-            this.mode = mode;
-        }
-
-        public int intValue(){
-            return mode
-        }
-    }
 }

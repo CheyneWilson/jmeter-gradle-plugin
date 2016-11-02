@@ -10,6 +10,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
@@ -23,7 +24,7 @@ import javax.xml.transform.TransformerException
 import static org.rendersnake.HtmlAttributesFactory.class_
 import static org.rendersnake.HtmlAttributesFactory.lang
 
-public class TaskJMReports extends DefaultTask {
+class TaskJMReports extends DefaultTask {
 
     protected final Logger log = Logging.getLogger(getClass())
 
@@ -31,6 +32,8 @@ public class TaskJMReports extends DefaultTask {
     @Optional
     File reportDir
 
+    @Input
+    @Optional
     List<ReportSpecs> reports = new ArrayList<>()
 
 //	TODO: createReports should only kick-in if there are new jtl files to process.
@@ -61,9 +64,17 @@ public class TaskJMReports extends DefaultTask {
 
                 if(reportType in [ReportType.AGGREGATE_REPORT, ReportType.SYNTHESIS_REPORT]){
                     // Only CSV is supported for AGGREGATE_REPORT, and SYNTHESIS_REPORT
-                    specs.mode = EnumSet.of(ReportSpecs.GraphMode.CSV)
+                    specs.mode = EnumSet.of(GraphMode.CSV)
                 }
                 reports.add(specs)
+            }
+        } else {
+            // Default the output mode to CSV + PNG as the plugin won't work without a mode
+            // This case is common when people are defining their own reports using a map.
+            for (specs in reports) {
+                if(specs.mode == null) {
+                    specs.mode = EnumSet.allOf(GraphMode)
+                }
             }
         }
 
@@ -111,17 +122,17 @@ public class TaskJMReports extends DefaultTask {
 	private void makeExtendedReports(File resultFile, List<ReportSpecs> reportSpecs) throws IOException {
         File workDir = project.jmeter.workDir ?: new File("./build/jmeter")
 
-        String name = FilenameUtils.removeExtension(resultFile.getName());
-        initializeJMeter(name, JMUtils.getJmeterPropsFile(project), workDir , reportDir);
+        String name = FilenameUtils.removeExtension(resultFile.getName())
+        initializeJMeter(name, JMUtils.getJmeterPropsFile(project), workDir , reportDir)
 
         try {
-            log.info("Creating Extended Reports {}", resultFile.getName());
+            log.info("Creating Extended Reports {}", resultFile.getName())
             for (ReportSpecs specs : reportSpecs) {
                 generateReportFile(resultFile, specs)
             }
             makeHTMLExtendedReport(reportSpecs, resultFile)
         } catch (Throwable e) {
-            log.error("Failed to create extended report for " + resultFile, e);
+            log.error("Failed to create extended report for " + resultFile, e)
         }
 	}
 
@@ -141,15 +152,14 @@ public class TaskJMReports extends DefaultTask {
 
         PluginsCMDWorker worker = new PluginsCMDWorker()
         try {
-            worker.setInputFile(resultFile.getAbsolutePath());
-            worker.setPluginType(specs.pluginType);
+            worker.setInputFile(resultFile.getAbsolutePath())
+            worker.setPluginType(specs.pluginType)
             worker.addExportMode(specs.getOutputMode())
-
-            if (specs.mode.contains(ReportSpecs.GraphMode.PNG)){
-                worker.setOutputPNGFile(imgDir.getCanonicalPath() + File.separator + "${specs.outputFileName}.png");
+            if (specs.mode.contains(GraphMode.PNG)){
+                worker.setOutputPNGFile(imgDir.getCanonicalPath() + File.separator + "${specs.outputFileName}.png")
             }
-            if (specs.mode.contains(ReportSpecs.GraphMode.CSV)){
-                worker.setOutputCSVFile(csvDir.getCanonicalPath() + File.separator + "${specs.outputFileName}.csv");
+            if (specs.mode.contains(GraphMode.CSV)){
+                worker.setOutputCSVFile(csvDir.getCanonicalPath() + File.separator + "${specs.outputFileName}.csv")
             }
 
             if (specs.width != null ){ worker.graphWidth = specs.width }
@@ -178,9 +188,9 @@ public class TaskJMReports extends DefaultTask {
             if (specs.startOffset != null ){  worker.startOffset = specs.startOffset as String }
             if (specs.endOffset != null ){  worker.endOffset = specs.endOffset as String}
 
-            worker.doJob();
+            worker.doJob()
         } catch (Exception e) {
-            log.error("Failed to create report: ${specs.reportType} for ${name} due to: ", e);
+            log.error("Failed to create report: ${specs.reportType} for ${name} due to: ", e)
         }
 
     }
@@ -188,11 +198,11 @@ public class TaskJMReports extends DefaultTask {
 
     private static void initializeJMeter(String name, File jmProps, File jmHome, File reportBaseDir) {
         // Initialize JMeter settings..
-        JMeterUtils.setJMeterHome(jmHome.getAbsolutePath());
-        JMeterUtils.loadJMeterProperties(jmProps.getAbsolutePath());
-        JMeterUtils.setProperty("log_file", reportBaseDir.getCanonicalPath() + File.separator + name + ".log");
-        JMeterUtils.initLogging();
-        JMeterUtils.initLocale();
+        JMeterUtils.setJMeterHome(jmHome.getAbsolutePath())
+        JMeterUtils.loadJMeterProperties(jmProps.getAbsolutePath())
+        JMeterUtils.setProperty("log_file", reportBaseDir.getCanonicalPath() + File.separator + name + ".log")
+        JMeterUtils.initLogging()
+        JMeterUtils.initLocale()
     }
 
 
@@ -203,34 +213,34 @@ public class TaskJMReports extends DefaultTask {
      */
     private void makeHTMLReport(File resultFile, List<ReportSpecs> specs) {
         try {
-            ReportTransformer transformer;
-            transformer = new ReportTransformer(getXslt());
-            log.info("Building HTML Report.");
+            ReportTransformer transformer
+            transformer = new ReportTransformer(getXslt())
+            log.info("Building HTML Report.")
 
-            String reportTitle = project.jmeter.reportTitle ?: "Generated from: " + resultFile.getName();
-            final File outputFile = new File(toOutputFileName(resultFile.getAbsolutePath()));
-            log.info("transforming: {} to {}", resultFile, outputFile);
-            transformer.transform(resultFile, outputFile, reportTitle);
+            String reportTitle = project.jmeter.reportTitle ?: "Generated from: " + resultFile.getName()
+            final File outputFile = new File(toOutputFileName(resultFile.getAbsolutePath()))
+            log.info("transforming: {} to {}", resultFile, outputFile)
+            transformer.transform(resultFile, outputFile, reportTitle)
 
         } catch (FileNotFoundException e) {
-            log.error("Can't transform result", e);
-            throw new GradleException("Error writing report file jmeter file.", e);
+            log.error("Can't transform result", e)
+            throw new GradleException("Error writing report file jmeter file.", e)
         } catch (TransformerException e) {
-            log.error("Can't transform result", e);
-            throw new GradleException("Error transforming jmeter results", e);
+            log.error("Can't transform result", e)
+            throw new GradleException("Error transforming jmeter results", e)
         } catch (IOException e) {
-            log.error("Can't transform result", e);
-            throw new GradleException("Error copying resources to jmeter results", e);
+            log.error("Can't transform result", e)
+            throw new GradleException("Error copying resources to jmeter results", e)
         }  catch (Exception e) {
-            log.error("Can't transform result", e);
+            log.error("Can't transform result", e)
         }
     }
 
     private String toOutputFileName(String fileName) {
         if (fileName.endsWith(".xml")) {
-            return fileName.replace(".xml", project.jmeter.reportPostfix + ".html");
+            return fileName.replace(".xml", project.jmeter.reportPostfix + ".html")
         } else {
-            return fileName + project.jmeter.reportPostfix;
+            return fileName + project.jmeter.reportPostfix
         }
     }
 
@@ -242,8 +252,8 @@ public class TaskJMReports extends DefaultTask {
             log.debug("Using reports/jmeter-results-detail-report_21.xsl for building report")
             return Thread.currentThread().getContextClassLoader().getResourceAsStream("reports/jmeter-results-detail-report_21.xsl")
         } else {
-            log.debug("Using {} for building report", project.jmeter.reportXslt);
-            return new FileInputStream(project.jmeter.reportXslt);
+            log.debug("Using {} for building report", project.jmeter.reportXslt)
+            return new FileInputStream(project.jmeter.reportXslt)
         }
     }
 
@@ -251,10 +261,12 @@ public class TaskJMReports extends DefaultTask {
     private makeHTMLExtendedReport(List<ReportSpecs> reportSpecs, File resultFile){
         //Get list of images
         File imgDir = new File(reportDir, "extReport-img")
+
         String[] includePattern = reportSpecs
             .findAll {
-                it.mode.contains(ReportSpecs.GraphMode.PNG)
-            }.collect {
+                it.mode.contains(GraphMode.PNG)
+            }
+              .collect {
                 it.outputFileName + ".png"
             }
 
@@ -266,7 +278,7 @@ public class TaskJMReports extends DefaultTask {
         IOUtils.copy(this.getClass().getClassLoader().getResourceAsStream("reports/assets/style.css"), fos)
 
         //create HTML
-        HtmlCanvas html = new HtmlCanvas(new PrettyWriter());
+        HtmlCanvas html = new HtmlCanvas(new PrettyWriter())
         html.html(lang("en"))
             .head()
                 .title().content("Extended Test Report - generated by jmeter-gradle-plugin")

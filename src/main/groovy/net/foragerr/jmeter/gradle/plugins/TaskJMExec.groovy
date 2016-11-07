@@ -89,8 +89,8 @@ class TaskJMExec extends DefaultTask {
         // Have set it in the jmeter.properties file in the interim
         // testConfig.jmeterProperties.put("jmeter.save.saveservice.output_format", "xml")
 
-        testConfig.maxHeapSize = maxHeapSize ?: project.jmeter.maxHeapSize
-        testConfig.minHeapSize = minHeapSize ?: project.jmeter.minHeapSize
+        testConfig.maxHeapSize = maxHeapSize ?: project.jmeter.maxHeapSize ?: "512M"
+        testConfig.minHeapSize = minHeapSize ?: project.jmeter.minHeapSize ?: "512M"
 
 
         testConfig.remote = remote != null ? remote : project.jmeter.remote

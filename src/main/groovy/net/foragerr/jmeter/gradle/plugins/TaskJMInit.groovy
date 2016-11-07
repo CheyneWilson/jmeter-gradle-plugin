@@ -20,9 +20,6 @@ class TaskJMInit extends DefaultTask {
     jmInit() {
 
         //Init plugin settings
-        project.jmeter.maxHeapSize = project.jmeter.maxHeapSize ?: "512M"
-        project.jmeter.minHeapSize = project.jmeter.minHeapSize ?: "512M"
-        project.jmeter.reportPostfix = ""
 
         File buildDir = project.getBuildDir()
         File workDir = new File(buildDir, "jmeter")

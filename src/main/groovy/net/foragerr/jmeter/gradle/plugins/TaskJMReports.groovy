@@ -42,10 +42,14 @@ class TaskJMReports extends DefaultTask {
     @Optional
     File resultFile
 
+    private String reportPostfix
+
     @TaskAction
     jmCreateReport(){
 
         List<File> jmResultFiles = new ArrayList<File>()
+
+        reportPostfix = project.jmeter.reportPostfix ?: ""
 
         reportDir = reportDir ?: project.jmeter.reportDir ?: new File(project.buildDir, "jmeter-report")
         if (resultFile != null) {
@@ -238,9 +242,9 @@ class TaskJMReports extends DefaultTask {
 
     private String toOutputFileName(String fileName) {
         if (fileName.endsWith(".xml")) {
-            return fileName.replace(".xml", project.jmeter.reportPostfix + ".html")
+            return fileName.replace(".xml", reportPostfix + ".html")
         } else {
-            return fileName + project.jmeter.reportPostfix
+            return fileName + reportPostfix
         }
     }
 

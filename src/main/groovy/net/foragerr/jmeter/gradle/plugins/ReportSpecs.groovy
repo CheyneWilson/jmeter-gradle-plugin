@@ -1,6 +1,5 @@
 package net.foragerr.jmeter.gradle.plugins
 
-import kg.apc.jmeter.PluginsCMDWorker
 import groovy.transform.Canonical
 
 /**

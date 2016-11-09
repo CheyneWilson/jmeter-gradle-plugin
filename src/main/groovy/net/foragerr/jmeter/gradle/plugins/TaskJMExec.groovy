@@ -17,7 +17,7 @@ import org.gradle.api.tasks.OutputFile
  */
 class TaskJMExec extends DefaultTask {
 
-    static final Logger LOG = Logging.getLogger(getClass());
+    static final Logger LOG = Logging.getLogger(getClass())
 
     File testFile = null                        //maps to -t, --testfile
 
@@ -92,10 +92,9 @@ class TaskJMExec extends DefaultTask {
         testConfig.maxHeapSize = maxHeapSize ?: project.jmeter.maxHeapSize ?: "512M"
         testConfig.minHeapSize = minHeapSize ?: project.jmeter.minHeapSize ?: "512M"
 
-
         testConfig.remote = remote != null ? remote : project.jmeter.remote
 
-        return testConfig;
+        return testConfig
     }
 
     /**
@@ -109,6 +108,8 @@ class TaskJMExec extends DefaultTask {
         try {
             LOG.info("Executing jMeter test : ${testConfig.testFile?.getCanonicalPath()}")
             testConfig.resultFile?.delete()
+
+            testConfig.reportDir.mkdirs()  // Create the report directory for this test
 
             new JMeterRunner().executeJmeterCommand(testConfig, runnerType)
             return testConfig.resultFile

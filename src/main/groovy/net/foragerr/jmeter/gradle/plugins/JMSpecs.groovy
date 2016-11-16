@@ -10,30 +10,30 @@ import org.gradle.api.logging.Logging
  */
 class JMSpecs implements Serializable{
 
-    private final static Logger LOG = Logging.getLogger(getClass());
+    private final static Logger LOG = Logging.getLogger(getClass())
 
-    File testFile = null                      //maps to -t, --testfile
+    File testFile = null                            // maps to -t, --testfile
     File jmeterLogFile = null
 
     String maxHeapSize
     String minHeapSize
 
-    File propFile = null                        // maps to -p, --propfile
+    File propFile = null                            // maps to -p, --propfile
 
-    List<File> addPropFiles = null              //maps to -q, --addprop
-    Map<String, ?> jmeterProperties = null      //maps to -J, --jmeterproperty
+    List<File> addPropFiles = null                  // maps to -q, --addprop
+    Map<String, ?> jmeterProperties = null          // maps to -J, --jmeterproperty
 
     List<File> systemPropertiesFiles = null         // maps to -S, --systemPropertyFile
     Map<String, ?> systemProperties = null          // maps to -D, --systemproperty
 
-    Map<String, ?> globalProperties = null          //maps to -G, --globalproperty
-    File globalPropertiesFile                       //pass the properties in the files to remote injectors via -G
+    Map<String, ?> globalProperties = null          // maps to -G, --globalproperty
+    File globalPropertiesFile                       // pass the properties in the files to remote injectors via -G
 
-    Boolean remote = false                          //maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
-    List<String> remoteHosts                        //convenience field, maps to -Jremote_hosts=S1,S2,S3...
-    List<String> remoteStart                        //maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
-    Boolean remoteExit = false                      //maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
-    Boolean nongui                                  //maps to -n, --nongui,    run JMeter in nongui mode
+    Boolean remote = false                          // maps to -r, --runremote, Start remote servers (as defined in remote_hosts)
+    List<String> remoteHosts                        // convenience field, maps to -Jremote_hosts=S1,S2,S3...
+    List<String> remoteStart                        // maps to -R, --remotestart, Start these remote servers (overrides remote_hosts)
+    Boolean remoteExit = false                      // maps to -X, --remoteexit, Exit the remote servers at end of test (non-GUI)
+    Boolean nongui                                  // maps to -n, --nongui,    run JMeter in nongui mode
 
     Boolean ignoreErrors = null
     Boolean ignoreFailures = null
@@ -59,7 +59,7 @@ class JMSpecs implements Serializable{
      * @return the JMeter command line arguments used when invoking jmeter to run the test configured in this JMSpec
      */
     List<String> getJmeterCommandLineArguments() {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<String>()
 
         if(nongui){
             args.add("-n")
@@ -78,9 +78,9 @@ class JMSpecs implements Serializable{
         ))
 
         if(remoteStart != null){
-            args.add("-R${remoteStart.join(",")}");
+            args.add("-R${remoteStart.join(",")}")
         } else if (remoteHosts != null){
-            args.add("-Jremote_hosts=${remoteHosts.join(",")}");
+            args.add("-Jremote_hosts=${remoteHosts.join(",")}")
         }
 
         if(remote){

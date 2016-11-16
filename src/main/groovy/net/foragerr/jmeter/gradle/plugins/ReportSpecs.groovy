@@ -27,7 +27,7 @@ class ReportSpecs {
     Integer limitRows                 //  --limit-rows <num of points> limit number of points in row
     Integer forceY                    //  --force-y <limit> force Y axis limit
     Integer hideLowCounts             //  --hide-low-counts <limit> hide points with sample count below limit
-    Boolean successFilter            //  --success-filter <true/false> filter samples by success flag (since 0.5.6), possible values are true, false, if not set no filtering on success flag will occur
+    Boolean successFilter             //  --success-filter <true/false> filter samples by success flag (since 0.5.6), possible values are true, false, if not set no filtering on success flag will occur
     String[] includeLabels            //  --include-labels <labels list> include in report only samples with specified labels, comma-separated
     String[] excludeLabels            //  --exclude-labels <labels list> exclude from report samples with specified labels, comma-separated
     Boolean autoScale                 //  --auto-scale <yes/no> enable/disable auto-scale multipliers for perfmon/composite graph

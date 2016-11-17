@@ -64,32 +64,32 @@ class TaskJMInit extends DefaultTask {
     protected void initTempProperties() throws IOException {
         List<File> tempProperties = new ArrayList<File>();
 
-        File saveServiceProperties = new File(project.jmeter.workDir, "saveservice.properties");
-        System.setProperty("saveservice_properties", "/" + saveServiceProperties.getName());
-        tempProperties.add(saveServiceProperties);
+        File saveServiceProperties = new File(project.jmeter.workDir, "saveservice.properties")
+        System.setProperty("saveservice_properties", "/" + saveServiceProperties.getName())
+        tempProperties.add(saveServiceProperties)
         log.debug("saveservice_properties location is " + System.getProperty("saveservice_properties"))
 
-        File upgradeProperties = new File(project.jmeter.workDir, "upgrade.properties");
-        System.setProperty("upgrade_properties", "/" + upgradeProperties.getName());
-        tempProperties.add(upgradeProperties);
+        File upgradeProperties = new File(project.jmeter.workDir, "upgrade.properties")
+        System.setProperty("upgrade_properties", "/" + upgradeProperties.getName())
+        tempProperties.add(upgradeProperties)
 
-        File defaultJmeterProperties = new File(project.jmeter.workDir, "jmeter.properties");
-        System.setProperty("default_jm_properties", "/" + defaultJmeterProperties.getName());
-        tempProperties.add(defaultJmeterProperties);
+        File defaultJmeterProperties = new File(project.jmeter.workDir, "jmeter.properties")
+        System.setProperty("default_jm_properties", "/" + defaultJmeterProperties.getName())
+        tempProperties.add(defaultJmeterProperties)
 
-        File jmPluginProperties = new File(project.jmeter.workDir, "jmeter-plugin.properties");
-        System.setProperty("default_jm_plugin_properties", "/" + jmPluginProperties.getName());
-        tempProperties.add(jmPluginProperties);
+        File jmPluginProperties = new File(project.jmeter.workDir, "jmeter-plugin.properties")
+        System.setProperty("default_jm_plugin_properties", "/" + jmPluginProperties.getName())
+        tempProperties.add(jmPluginProperties)
 
         //Copy files from jar to workDir
         for (File f : tempProperties) {
             try {
-                FileWriter writer = new FileWriter(f);
-                IOUtils.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(f.getName()), writer);
-                writer.flush();
-                writer.close();
+                FileWriter writer = new FileWriter(f)
+                IOUtils.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(f.getName()), writer)
+                writer.flush()
+                writer.close()
             } catch (IOException ioe) {
-                throw new GradleException("Couldn't create temporary property file ${f.getName()} in directory ${project.jmeter.workDir.getPath()}", ioe);
+                throw new GradleException("Couldn't create temporary property file ${f.getName()} in directory ${project.jmeter.workDir.getPath()}", ioe)
             }
 
         }
@@ -116,7 +116,7 @@ class TaskJMInit extends DefaultTask {
             }
         }
         cp.append(new File(project.jmeter.workDir, "lib" + File.separator + "ext").getCanonicalPath())
-        System.setProperty("search_paths", cp.toString());
+        System.setProperty("search_paths", cp.toString())
         log.debug("Search path is set to " + System.getProperty("search_paths"))
     }
 

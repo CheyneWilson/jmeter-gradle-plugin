@@ -85,10 +85,6 @@ class TaskJMExec extends DefaultTask {
         testConfig.systemProperties.put("jmeter.home", testConfig.workDir.getAbsolutePath())
         testConfig.systemProperties.put("log_file", testConfig.jmeterLogFile.getAbsolutePath())
 
-        // TODO: would prefer if jmeter.save.saveservice.output_format was in a properties file, ideally user.properties
-        // Have set it in the jmeter.properties file in the interim
-        // testConfig.jmeterProperties.put("jmeter.save.saveservice.output_format", "xml")
-
         testConfig.maxHeapSize = maxHeapSize ?: project.jmeter.maxHeapSize ?: "512M"
         testConfig.minHeapSize = minHeapSize ?: project.jmeter.minHeapSize ?: "512M"
 

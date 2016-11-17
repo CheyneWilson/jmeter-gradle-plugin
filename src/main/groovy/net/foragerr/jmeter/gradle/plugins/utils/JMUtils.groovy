@@ -19,26 +19,26 @@ class JMUtils {
     static final LOG = Logging.getLogger(getClass())
 
     static List<File> getListOfTestFiles(Project project){
-        List<File> testFiles = new ArrayList<File>();
+        List<File> testFiles = new ArrayList<File>()
         if (project.jmeter.testFiles != null) {
             project.jmeter.testFiles.each { File file ->
                 if (file.exists() && file.isFile()) {
-                    testFiles.add(file);
+                    testFiles.add(file)
                 } else {
-                    throw new GradleException("Test file ${file.getCanonicalPath()} does not exists");
+                    throw new GradleException("Test file ${file.getCanonicalPath()} does not exists")
                 }
             }
         } else {
-            String[] excludes = project.jmeter.excludes == null ?  [] as String[] : project.jmeter.excludes as String[];
-            String[] includes = project.jmeter.includes == null ? ["**/*.jmx"] as String[] : project.jmeter.includes as String[];
+            String[] excludes = project.jmeter.excludes == null ?  [] as String[] : project.jmeter.excludes as String[]
+            String[] includes = project.jmeter.includes == null ? ["**/*.jmx"] as String[] : project.jmeter.includes as String[]
 
             log.info("includes: ${includes}")
             log.info("excludes: ${excludes}")
-            testFiles.addAll(scanDir(project, includes, excludes, project.jmeter.testFileDir));
+            testFiles.addAll(scanDir(project, includes, excludes, project.jmeter.testFileDir))
             log.info(testFiles.size() + " test files found in folder scan")
         }
 
-        return testFiles;
+        return testFiles
     }
 
     static File getJmeterPropsFile(Project project) {
@@ -75,35 +75,44 @@ class JMUtils {
         if (testConfig.testFile == null){
             return null
         }
-        DateFormat defaultFmt = new SimpleDateFormat("yyyyMMdd-HHmm");
-		//if resultFilenameTimestamp is "useSaveServiceFormat" use saveservice.format
+        DateFormat defaultFmt = new SimpleDateFormat("yyyyMMdd-HHmm")
+
+        // TODO: Doesn't respect the overrides in user.properties .. I guess coz we're not loading them, need to fix elsewhere
+        // Eventually we may drop support for XML output, if that is the direction JMeter is heading.
+        String suffix = System.properties.'jmeter.save.saveservice.output_format'
+        if (suffix in ["csv", "xml"]){
+            // use the suffix
+        } else {
+            suffix = "csv" // default
+        }
+
 		if (project.jmeter.resultFilenameTimestamp == "useSaveServiceFormat"){
-			String saveServiceFormat =  System.getProperty("jmeter.save.saveservice.timestamp_format");
+			String saveServiceFormat =  System.getProperty("jmeter.save.saveservice.timestamp_format")
 			if (saveServiceFormat == "none") {
-                return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
+                return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.$suffix")
             }
 			try
 			{
-                DateFormat saveFormat = new SimpleDateFormat(saveServiceFormat);
-				return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${saveFormat.format(new Date())}.xml");
+                DateFormat saveFormat = new SimpleDateFormat(saveServiceFormat)
+				return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${saveFormat.format(new Date())}.$suffix")
 			}
 			catch (Exception e)
 			{
 				// jmeter.save.saveservice.timestamp_format does not contain a valid format
-				log.warn("jmeter.save.saveservice.timestamp_format Not defined, using default timestamp format");
+				log.warn("jmeter.save.saveservice.timestamp_format Not defined, using default timestamp format")
 			}
 		}
 
         //if resultFilenameTimestamp is "none" do not use a timestamp in filename
         else if (project.jmeter.resultFilenameTimestamp == "none") {
-            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.xml");
+            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}.$suffix")
         }
 
         else if (project.jmeter.resultFilenameTimestamp == null) {
-            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.xml");
+            return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.$suffix")
         }
 
-        return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.xml");
+        return new File(testConfig.reportDir, "${testConfig.testFile.getName()}-${defaultFmt.format(new Date())}.$suffix")
     }
 
 	
@@ -121,6 +130,6 @@ class JMUtils {
         } else {
             LOG.warn("Attempted to load Jmeter files from {}, but this directory does not exist.", baseDir)
         }
-        return scanResults;
+        return scanResults
     }
 }

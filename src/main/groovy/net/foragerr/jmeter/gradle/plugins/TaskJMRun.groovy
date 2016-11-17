@@ -16,7 +16,7 @@ class TaskJMRun extends TaskJMExec {
     @TaskAction
     jmRun() {
         //Run Tests
-        List<File> resultList = new ArrayList<File>();
+        List<File> resultList = new ArrayList<File>()
 
         if (testFile == null) {
             //Get List of test files to run from the jmeter config element
@@ -29,19 +29,19 @@ class TaskJMRun extends TaskJMExec {
 
             else {
                 for (File testFile : testFiles) {
-                    JMSpecs testConfig = setupTestConfig(testFile);
+                    JMSpecs testConfig = setupTestConfig(testFile)
                     resultList.add(executeJMeterScript(testConfig, project.jmeter.runnerType))
                 }
             }
         } else {
             // Run the test defined in the task instead of in the jmeter config
-            JMSpecs testConfig = setupTestConfig(testFile);
+            JMSpecs testConfig = setupTestConfig(testFile)
             resultFile = executeJMeterScript(testConfig, project.jmeter.runnerType)
-            resultList.add(resultFile);
+            resultList.add(resultFile)
         }
         //Scan for errors
-        checkForErrors(resultList);
-        project.jmeter.jmResultFiles = resultList;
+        checkForErrors(resultList)
+        project.jmeter.jmResultFiles = resultList
     }
 
     @Override
@@ -56,11 +56,11 @@ class TaskJMRun extends TaskJMExec {
         try {
             for (File file : results) {
                 if (scanner.scanForProblems(file)) {
-                    LOG.warn("There were test errors.  See the jmeter logs for details");
+                    LOG.warn("There were test errors. See the jmeter logs for details")
                 }
             }
         } catch (IOException e) {
-            throw new GradleException("Can't read log file", e);
+            throw new GradleException("Can't read log file", e)
         }
     }
 }

@@ -1,7 +1,7 @@
 package net.foragerr.jmeter.gradle.plugins.worker
 
 import groovy.io.FileType
-import org.gradle.internal.os.OperatingSystem;
+import org.gradle.internal.os.OperatingSystem
 import net.foragerr.jmeter.gradle.plugins.JMSpecs
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
@@ -128,10 +128,10 @@ class JMeterRunner {
     private File generatePatherJar(String workDir){
         File patherJar = new File(new File(workDir), "pather.jar")
         if (patherJar.exists()) patherJar.delete()
-        Manifest manifest = new Manifest();
-        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        Manifest manifest = new Manifest()
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0")
 
-        StringBuilder cpBuilder = new StringBuilder();
+        StringBuilder cpBuilder = new StringBuilder()
 
         //add from jmeter/lib
         new File(workDir, "lib").eachFileRecurse(FileType.FILES){ file ->
@@ -161,7 +161,7 @@ class JMeterRunner {
      */
     private List<String> getGradlePluginCommandLineArguments () {
 
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<String>()
         args.add("-Dsearch_paths=${System.getProperty("search_paths")}")
         args.add("-Dsaveservice_properties=${System.getProperty("saveservice_properties")}")
         args.add("-Dupgrade_properties=${System.getProperty("upgrade_properties")}")

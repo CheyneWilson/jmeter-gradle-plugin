@@ -94,6 +94,7 @@ class TaskJMReports extends DefaultTask {
                 // Could expand the conditions that affect the name, or better, use some kind of pattern
                 // But instead we may move to a different way of rendering results..?
                 String success = specs.successFilter == null ? "" : (specs.successFilter ? " (success)" : " (failure)")
+
                 specs.outputFileName = "${name}_${i}_${specs.reportType}${success}"
                 i += 1
             }
@@ -212,9 +213,12 @@ class TaskJMReports extends DefaultTask {
 
     /**
      * Makes the JMeter HTML Report
-     * @param resultFile
+     * @param resultFile (Must be for jtl format, not csv.)
      * @param specs
+     * @deprecated  We will be moving away from the XML file transform based reporting to JMeter Plugins and jmeter -g reports.
+     *              The -g reports are the new way and incompatible with XML transform.
      */
+    @Deprecated
     private void makeHTMLReport(File resultFile, List<ReportSpecs> specs) {
         try {
             ReportTransformer transformer
@@ -240,6 +244,7 @@ class TaskJMReports extends DefaultTask {
         }
     }
 
+    @Deprecated
     private String toOutputFileName(String fileName) {
         if (fileName.endsWith(".xml")) {
             return fileName.replace(".xml", reportPostfix + ".html")
@@ -248,6 +253,7 @@ class TaskJMReports extends DefaultTask {
         }
     }
 
+    @Deprecated
     private InputStream getXslt() throws IOException {
         if (project.jmeter.reportXslt == null) {
             //if we are using the default report, also copy the images out.

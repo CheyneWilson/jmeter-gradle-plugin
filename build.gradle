@@ -1,106 +1,39 @@
-//--- Plugins ---
-plugins {
-    id "com.jfrog.bintray" version "1.2"
-	id "com.jfrog.artifactory" version "3.1.1"
-	id "com.gradle.plugin-publish" version "0.9.1"
+buildscript {
+    ext {
+        artifactoryUrl = System.getenv('artifactory')
+    }
+    repositories {
+        maven { url "$artifactoryUrl/plugins-release" }
+    }
+    dependencies {
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+    }
 }
 
 apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
 apply plugin: 'maven-publish'
 
+apply plugin: "com.jfrog.artifactory"
+
+repositories {
+    maven {url "$artifactoryUrl/repo1"}
+}
 
 //--- Project information ---
 group = 'net.foragerr.jmeter'
 archivesBaseName = 'jmeter-gradle-plugin'
-
-ext.thisPluginVersion="1.0.8.10"
-ext.jmVersion = "3.0"
-ext.jmPluginVersion = "1.4.0"
-version = "$jmVersion-$thisPluginVersion"
-
-//--- Repositories ---
-repositories {
-    mavenCentral()
-    jcenter()
-}
-configurations{
-    gradleApi
-}
+version = "2.0.0"
 
 
-//--- Dependencies ---
+
 dependencies {
-    gradleApi gradleApi()
-    compile project.configurations.getByName('gradleApi')
-            .filter {it.name != 'groovy-all-2.4.4.jar'}
-    compile	'org.codehaus.groovy:groovy-all:2.4.7'
-    compile 'xml-apis:xml-apis:1.4.01'
-    compile	'org.apache.ant:ant:1.8.4'
-    compile	'org.rendersnake:rendersnake:1.8'
-    compile	'org.beanshell:bsh-core:2.0b4'
-		
-    //jm-plugins dependencies
-    compile("kg.apc:jmeter-plugins:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-    compile("kg.apc:jmeter-plugins-standard:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-    compile("kg.apc:jmeter-plugins-extras:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-    compile("kg.apc:jmeter-plugins-common:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-    compile("kg.apc:jmeter-plugins-extras-libs:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-    compile("kg.apc:jmeter-plugins-webdriver:${jmPluginVersion}"){
-        exclude group: 'commons-math3', module: 'commons-math3'
-        exclude group: 'commons-pool2', module: 'commons-pool2'
-        exclude group: 'xml-apis', module: 'xml-apis'
-    }
-
-    //jm dependencies
-    compile("org.apache.jmeter:ApacheJMeter_components:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_http:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_jdbc:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_core:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_tcp:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_junit:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_java:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_mail:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_ldap:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_ftp:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_functions:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_monitors:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_jms:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_config:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_junit:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_components:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_config:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_junit-test:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_mongodb:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter_native:${jmVersion}")
-    compile("org.apache.jmeter:ApacheJMeter:${jmVersion}")
-
-	testCompile "junit:junit:4.11"
-}
-
-
-//--- Tasks ---
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
+    // gradleApi gradleApi()
+    // compile project.configurations.getByName('gradleApi')
+    compile 'org.codehaus.groovy:groovy-all:2.4.10'
+    compile 'org.rendersnake:rendersnake:1.8'
+    compile 'kg.apc:jmeter-plugins-cmd:2.1'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -110,7 +43,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
-	from sourceSets.main.allSource
+    from sourceSets.main.allSource
 }
 
 artifacts {
@@ -119,160 +52,68 @@ artifacts {
     archives javadocJar
 }
 
-processResources.doLast {
-    ant.replace(
-            file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
-            token: "@jmeter.version@",
-            value: "$jmVersion"
-    )
-    ant.replace(
-            file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
-            token: "@plugin.version@",
-            value: "$jmPluginVersion"
-    )
-	ant.replace(
-			file: "${project.buildDir}/resources/main/jmeter-plugin.properties",
-			token: "@thisPlugin.version@",
-			value: "$version"
-	)
+ def pomConfig = {
+    scm {
+        url 'scm:git@github.com:CheyneWilson/jmeter-gradle-plugin.git'
+        connection 'scm:git@github.com:CheyneWilson/jmeter-gradle-plugin.git'
+        developerConnection 'scm:git@github.com:CheyneWilson/jmeter-gradle-plugin.git'
+    }
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id 'foragerr'
+            name 'RaGe'
+            url 'http://jmeter.foragerr.net'
+            email 'foragerr@gmail.com'
+            roles { role 'Developer' }
+        }
+        developer {
+            id 'cheyne'
+            name 'Cheyne Wilson'
+            email ''
+            roles { role 'Developer' }
+        }
+    }
 }
 
-//--- mvn-publish ---
-def pomConfig = {
-	scm {
-		url 'scm:git@github.com:jmeter-gradle-plugin/jmeter-gradle-plugin.git'
-		connection 'scm:git@github.com:jmeter-gradle-plugin/jmeter-gradle-plugin.git'
-		developerConnection 'scm:git@github.com:jmeter-gradle-plugin/jmeter-gradle-plugin.git'
-	}
-	licenses {
-		license {
-			name 'The Apache Software License, Version 2.0'
-			url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-			distribution 'repo'
-		}
-	}
-	developers {
-		developer {
-			id 'foragerr'
-			name 'RaGe'
-			url 'http://jmeter.foragerr.net'
-			email 'foragerr@gmail.com'
-			roles { role 'Developer' }
-		}
-	}
-}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-			//Workaround for gradle plugin-publish defect: https://issues.gradle.org/browse/GRADLE-3274
-            //since maven-publish refuses to propogate exclusions to pom, DIY. :(
-			from(components.java)
-			def dependencies =  project.configurations[JavaPlugin.COMPILE_CONFIGURATION_NAME].getAllDependencies()
-			def xmlExclusionList = project.configurations[JavaPlugin.COMPILE_CONFIGURATION_NAME].getExcludeRules()
-			pom.withXml{
-				asNode().dependencies.dependency.each{ xmlDep ->
-					//delete scope tag
-					def xmlScope = xmlDep.get("scope")	
-					if (xmlScope) xmlDep.remove(xmlScope)
-					//insert exclusions
-					def xmlExclusions = xmlDep.exclusions[0]
-					if (!xmlExclusions) xmlExclusions = xmlDep.appendNode('exclusions')
-					xmlExclusionList.each{ ExcludeRule exRule ->
-						def xmlExclusion = xmlExclusions.appendNode('exclusion')
-						xmlExclusion.appendNode('groupId', exRule.group)
-						xmlExclusion.appendNode('artifactId', exRule.module)
-					}	
-				}
-				
-			}
-			pom.withXml {
-				def root = asNode()
-				root.appendNode('description', 'A gradle plugin for running jmeter tests')
-				root.children().last() + pomConfig
-			}
-			artifact sourcesJar
-			artifact javadocJar
+            //Workaround for gradle plugin-publish defect: https://issues.gradle.org/browse/GRADLE-3274
+            //since maven-publish refuses to propagate exclusions to pom, DIY. :(
+            from(components.java)
+
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A gradle plugin for running jmeter tests')
+                root.children().last() + pomConfig
+            }
+
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }
 
-//--- bintray publishing ---
-//       for Releases
-bintrayUpload.onlyIf {
-	!(version ==~ /.*SNAPSHOT/)
-}
-bintray {
-	user = System.getenv('bintray_user')
-	key = System.getenv('bintray_api_key')
-	
-    publications = ['mavenJava'] //When uploading Maven-based publication files
-    publish = true //If version should be auto published after an upload
-    pkg {
-        repo = "jmeter"
-        name = "$archivesBaseName"
-        userOrg = "$archivesBaseName" 
-        licenses = ['Apache-2.0']
-        publicDownloadNumbers = true
-        websiteUrl = 'http://jmeter.foragerr.net'
-        issueTrackerUrl = 'https://github.com/jmeter-gradle-plugin/jmeter-gradle-plugin/issues'
-        vcsUrl = 'https://github.com/jmeter-gradle-plugin/jmeter-gradle-plugin.git'
 
-        version {
-            name = project.version //Bintray logical version name
-            released = new Date()
-            gpg { sign = true }
-            
-			//Optional configuration for Maven Central sync of the version
-            mavenCentralSync {
-                sync = false //true by default
-                user = 'userToken' //OSS user token
-                password = 'paasword' //OSS user password
-                close = '0' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }            
-        }
-    }
-}
-
-//--- gradle publishing ---
-//       for Releases
-publishPlugins.onlyIf {
-	!(version ==~ /.*SNAPSHOT/)
-}
-pluginBundle {
-    website = 'http://jmeter.foragerr.net'
-    vcsUrl = 'https://github.com/jmeter-gradle-plugin/jmeter-gradle-plugin.git'
-    description = 'A Gradle plugin for running JMeter tests'
-    tags = ['jmeter', 'performance']
-
-    plugins {
-        jmeterPlugin {
-          id = 'net.foragerr.jmeter'
-          displayName = 'JMeter Gradle Plugin'
-      }
-    }
-}
-
-//--- oss.jfrog artifactory publishing ---
-//         For SNAPSHOT publishing
 artifactory {
-	contextUrl = 'https://oss.jfrog.org/artifactory'
-	publish {
-		repository {
-			repoKey = 'oss-snapshot-local'
-			username = System.getenv('bintray_user')
-			password = System.getenv('bintray_api_key')
-		}
-
-		defaults {
-			publications('mavenJava')
-		}
-	}
-	resolve {
-		repository {
-			repoKey = 'oss-snapshot-local'
-			username = System.getenv('bintray_user')
-			password = System.getenv('bintray_api_key')
-		}
-	}
+    contextUrl = artifactoryUrl
+    publish {
+        repository {
+            repoKey = 'libs-snapshot'
+            username = System.getenv('artifactory_user')
+            password = System.getenv('artifactory_api_key')
+        }
+        defaults {
+            publications('mavenJava')
+        }
+    }
 }
+

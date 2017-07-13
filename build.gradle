@@ -34,6 +34,11 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.10'
     compile 'org.rendersnake:rendersnake:1.8'
     compile 'kg.apc:jmeter-plugins-cmd:2.1'
+    compile 'kg.apc:jmeter-plugins-synthesis:2.1'
+    compile 'kg.apc:jmeter-plugins-graphs-additional:2.0'
+    compile 'kg.apc:jmeter-plugins-graphs-basic:2.0'
+    compile 'kg.apc:jmeter-plugins-graphs-dist:2.0'
+
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
